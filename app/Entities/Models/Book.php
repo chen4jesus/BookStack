@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use BookStack\Entities\Queries\EntityQueries;
+
 
 /**
  * Class Book.
@@ -28,10 +30,12 @@ use Illuminate\Support\Collection;
  */
 class Book extends Entity implements HasCoverImage
 {
+    // use SoftDeletes;
     use HasFactory;
     use HasHtmlDescription;
 
     public float $searchFactor = 1.2;
+    public string $parent_type = '';
 
     protected $fillable = ['name'];
     protected $hidden = ['pivot', 'image_id', 'deleted_at', 'description_html'];
@@ -41,6 +45,29 @@ class Book extends Entity implements HasCoverImage
      */
     public function getUrl(string $path = ''): string
     {
+        // Extract the parent type and the remaining path
+        if ($this->parent_type && preg_match('/^(book_clubs|bookshelves|books|chapter|pages)\|(.+)$/', $this->parent_type, $matches)) {
+
+            $parentType = $matches[1]; // bookclub, bookshelf, or book
+            $remainingPath = $matches[2]; // book-clubs/12/books/23
+
+            $segments = explode('/', $remainingPath);
+            $result = [];
+
+            for ($i = 0; $i < count($segments); $i += 2) {
+                if (isset($segments[$i + 1]) && is_numeric($segments[$i + 1])) {
+                    $result[$segments[$i]] = (int) $segments[$i + 1];
+                }
+            }
+            $url = "";
+            $entityQueries = app(EntityQueries::class);
+
+            foreach ($result as $model_type => $model_id) {
+                $model_slug = $entityQueries->idToSlug($model_type, $model_id);
+                $url .= '/' . $model_type . '/' . $model_slug;
+            }
+            return url($url);
+        }
         return url('/books/' . implode('/', [urlencode($this->slug), trim($path, '/')]));
     }
 
@@ -123,6 +150,12 @@ class Book extends Entity implements HasCoverImage
     public function shelves(): BelongsToMany
     {
         return $this->belongsToMany(Bookshelf::class, 'bookshelves_books', 'book_id', 'bookshelf_id');
+    }
+    public function bookClubs(): BelongsToMany
+    {
+        return $this->belongsToMany(BookClub::class, 'book_clubs_books', 'book_id', 'book_clubs_id')
+            ->withPivot('order')
+            ->orderBy('order', 'asc');
     }
 
     /**

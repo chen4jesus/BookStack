@@ -13,6 +13,9 @@ use BookStack\Entities\Tools\BookContents;
 use BookStack\Http\ApiController;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use BookStack\Exports\ZipExports\ZipExportBuilder;
+use BookStack\Exports\ZipExports\ZipImportRunner;
+use BookStack\Exports\ImportRepo;
 
 class BookApiController extends ApiController
 {
@@ -114,6 +117,83 @@ class BookApiController extends ApiController
         $this->bookRepo->destroy($book);
 
         return response('', 204);
+    }
+
+    /**
+     * Export a book to a ZIP archive for download through the API.
+     * This method simulates the book export process, making all book content available in a ZIP file.
+     * 
+     * @param string $id ID of the book to export
+     * @return \Illuminate\Http\Response
+     */
+    public function zipBook(string $id, ZipExportBuilder $builder)
+    {
+        $book = $this->queries->findVisibleByIdOrFail($id);
+        $this->checkOwnablePermission('book-view', $book);
+        $this->checkPermission('content-export');
+        
+        try {
+            $zipPath = $builder->buildForBook($book);
+            
+            return response()->stream(
+                function () use ($zipPath) {
+                    $stream = fopen($zipPath, 'rb');
+                    fpassthru($stream);
+                    fclose($stream);
+                    @unlink($zipPath); // Clean up temporary file
+                },
+                200,
+                [
+                    'Content-Type' => 'application/zip',
+                    'Content-Disposition' => 'attachment; filename="' . $book->slug . '.zip"',
+                ]
+            );
+        } catch (\Exception $e) {
+            return $this->jsonError(['message' => 'Error exporting book: ' . $e->getMessage()]);
+        }
+    }
+    
+    /**
+     * Import a book from an uploaded ZIP file, bypassing the validation process.
+     * This method accepts a raw ZIP file upload and imports it directly into the system.
+     * 
+     * @param \Illuminate\Http\Request $request Request containing the uploaded ZIP file
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function unzipBook(Request $request, ZipImportRunner $importer, ImportRepo $importRepo)
+    {
+        $this->checkPermission('content-import');
+        
+        $requestData = $this->validate($request, [
+            'file' => ['required', 'file', 'mimes:zip'],
+            'name' => ['sometimes', 'string', 'max:255'],
+        ]);
+        
+        try {
+            // Store the uploaded file temporarily
+            $uploadedFile = $request->file('file');
+            $import = $importRepo->storeFromUpload($uploadedFile);
+            
+            // Run the import without parent (top-level book)
+            $entity = $importer->run($import, null);
+            
+            // If a name was provided, update the imported book's name
+            if (isset($requestData['name']) && $entity instanceof Book) {
+                $entity->name = $requestData['name'];
+                $entity->save();
+            }
+            
+            // Clean up the import
+            $importRepo->deleteImport($import);
+            
+            // Return the imported entity
+            return response()->json([
+                'message' => 'Book imported successfully',
+                'entity' => $this->forJsonDisplay($entity),
+            ]);
+        } catch (\Exception $e) {
+            return $this->jsonError(['message' => 'Error importing book: ' . $e->getMessage()]);
+        }
     }
 
     protected function forJsonDisplay(Book $book): Book

@@ -218,6 +218,7 @@ export class BookSort extends Component {
      * @param {Object} entityInfo
      */
     bookSelect(entityInfo) {
+        console.log("ol");
         const alreadyAdded = this.container.querySelector(`[data-type="book"][data-id="${entityInfo.id}"]`) !== null;
         if (alreadyAdded) return;
 

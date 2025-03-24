@@ -5,6 +5,7 @@ namespace BookStack\Entities\Controllers;
 use BookStack\Activity\Models\View;
 use BookStack\Activity\Tools\UserEntityWatchOptions;
 use BookStack\Entities\Models\Book;
+use BookStack\Entities\Queries\BookClubQueries;
 use BookStack\Entities\Queries\ChapterQueries;
 use BookStack\Entities\Queries\EntityQueries;
 use BookStack\Entities\Repos\ChapterRepo;
@@ -19,6 +20,7 @@ use BookStack\Exceptions\PermissionsException;
 use BookStack\Http\Controller;
 use BookStack\References\ReferenceFetcher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -29,6 +31,7 @@ class ChapterController extends Controller
         protected ChapterQueries $queries,
         protected EntityQueries $entityQueries,
         protected ReferenceFetcher $referenceFetcher,
+        protected BookClubQueries $bookclubQueries,
     ) {
     }
 
@@ -89,6 +92,7 @@ class ChapterController extends Controller
         return view('chapters.show', [
             'book'           => $chapter->book,
             'chapter'        => $chapter,
+            'bookclub'       => null,
             'current'        => $chapter,
             'sidebarTree'    => $sidebarTree,
             'watchOptions'   => new UserEntityWatchOptions(user(), $chapter),
@@ -97,6 +101,56 @@ class ChapterController extends Controller
             'previous'       => $nextPreviousLocator->getPrevious(),
             'referenceCount' => $this->referenceFetcher->getReferenceCountToEntity($chapter),
         ]);
+    }
+    public function showChapter(string $bookclubSlug, string $bookSlug,  string $chapterSlug)
+    {
+        if(!user()->isGuest()){
+            $bookclub = $this->bookclubQueries->findVisibleBySlugOrFail($bookclubSlug);
+            $user_id = auth()->id();
+            $bookclub_id = $bookclub->id;
+
+            // Ensure you're checking the correct relationship in the database
+            $joinUser = DB::table('book_clubs_users')
+                ->where('user_id', $user_id)
+                ->where('book_clubs_id', $bookclub_id)
+                ->exists();  // This will return true if a record exists
+
+            // If user is not part of the book club or is not admin (user_id != 1)
+            if (!$joinUser && $user_id != 1) {
+                return redirect(url('/book-clubs'));
+            }
+
+            if ($user_id == 1 && !$joinUser) {
+                DB::table('book_clubs_users')->insert([
+                    'user_id' => $user_id,
+                    'book_clubs_id' => $bookclub_id
+                ]);
+            }
+            $chapter = $this->queries->findVisibleBySlugsOrFail($bookSlug, $chapterSlug);
+            $this->checkOwnablePermission('chapter-view', $chapter);
+    
+            $sidebarTree = (new BookContents($chapter->book))->getTree();
+            $pages = $this->entityQueries->pages->visibleForChapterList($chapter->id)->get();
+            $nextPreviousLocator = new NextPreviousContentLocator($chapter, $sidebarTree);
+            View::incrementFor($chapter);
+    
+            $this->setPageTitle($chapter->getShortName());
+    
+            return view('chapters.show', [
+                'book'           => $chapter->book,
+                'chapter'        => $chapter,
+                'bookclub'        => $bookclub,
+                'current'        => $chapter,
+                'sidebarTree'    => $sidebarTree,
+                'watchOptions'   => new UserEntityWatchOptions(user(), $chapter),
+                'pages'          => $pages,
+                'next'           => $nextPreviousLocator->getNext(),
+                'previous'       => $nextPreviousLocator->getPrevious(),
+                'referenceCount' => $this->referenceFetcher->getReferenceCountToEntity($chapter),
+            ]);
+        } else {
+            return redirect(url('/login'));
+        }
     }
 
     /**

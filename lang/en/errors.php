@@ -59,6 +59,9 @@ return [
     // Attachments
     'attachment_not_found' => 'Attachment not found',
     'attachment_upload_error' => 'An error occurred uploading the attachment file',
+    'audio_upload_error' => 'An error occurred uploading the audio file',
+    'audio_not_found' => 'Audio not found',
+    'audio_upload_error' => 'An error occurred uploading the audio file',
 
     // Pages
     'page_draft_autosave_fail' => 'Failed to save draft. Ensure you have internet connection before saving this page',
@@ -68,6 +71,7 @@ return [
     // Entities
     'entity_not_found' => 'Entity not found',
     'bookshelf_not_found' => 'Shelf not found',
+    'bookclub_not_found' => 'Book club not found',
     'book_not_found' => 'Book not found',
     'page_not_found' => 'Page not found',
     'chapter_not_found' => 'Chapter not found',
@@ -79,7 +83,7 @@ return [
     'users_cannot_delete_only_admin' => 'You cannot delete the only admin',
     'users_cannot_delete_guest' => 'You cannot delete the guest user',
     'users_could_not_send_invite' => 'Could not create user since invite email failed to send',
-
+    'user_not_found' => 'User not found',
     // Roles
     'role_cannot_be_edited' => 'This role cannot be edited',
     'role_system_cannot_be_deleted' => 'This role is a system role and cannot be deleted',

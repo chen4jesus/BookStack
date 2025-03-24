@@ -18,9 +18,9 @@
 @section('body')
 
     <div class="mb-s print-hidden">
-        @include('entities.breadcrumbs', ['crumbs' => [
-            $book,
-        ]])
+        @include('entities.breadcrumbs', [
+        'crumbs' => $bookclub ? [$bookclub, $book] : [$book]
+    ])
     </div>
 
     <main class="content-wrap card">
@@ -31,9 +31,9 @@
                 <div class="entity-list book-contents">
                     @foreach($bookChildren as $childElement)
                         @if($childElement->isA('chapter'))
-                            @include('chapters.parts.list-item', ['chapter' => $childElement])
+                            @include('chapters.parts.list-item', ['chapter' => $childElement, 'bookclub' => $bookclub ?? null, "book " => $book ?? null])
                         @else
-                            @include('pages.parts.list-item', ['page' => $childElement])
+                            @include('pages.parts.list-item', ['page' => $childElement, 'bookclub' => $bookclub ?? null, "book" => $book ?? null])
                         @endif
                     @endforeach
                 </div>
@@ -61,9 +61,18 @@
             @endif
         </div>
 
+
+
         @include('entities.search-results')
     </main>
-
+    @if (Auth::check())
+        @include('layouts.parts.audio')
+    @endif
+    
+    <div class="comments-container mb-l print-hidden">
+        @include('books.parts.reviews', ['reviews' => $reviews,'bookclub' => $bookclub, 'review' => $review ?? null, 'book' => $book, 'users'=> $membersPro])
+        <div class="clearfix"></div>
+    </div>
 @stop
 
 @section('right')
@@ -163,12 +172,18 @@
         </div>
     @endif
 
-    @if(count($bookParentShelves) > 0)
+    {{-- @if(count($bookParentShelves) > 0)
         <div class="actions mb-xl">
             <h5>{{ trans('entities.shelves') }}</h5>
             @include('entities.list', ['entities' => $bookParentShelves, 'style' => 'compact'])
         </div>
     @endif
+    @if(count($bookParentBookClubs) > 0)
+        <div class="actions mb-xl">
+            <h5>{{ trans('entities.shelves') }}</h5>
+            @include('entities.list', ['entities' => $bookParentBookClubs, 'style' => 'compact'])
+        </div>
+    @endif --}}
 
     @if(count($activity) > 0)
         <div id="recent-activity" class="mb-xl">

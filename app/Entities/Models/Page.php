@@ -2,16 +2,19 @@
 
 namespace BookStack\Entities\Models;
 
+use BookStack\Entities\Queries\EntityQueries;
 use BookStack\Entities\Tools\PageContent;
 use BookStack\Entities\Tools\PageEditorType;
 use BookStack\Permissions\PermissionApplicator;
 use BookStack\Uploads\Attachment;
+use BookStack\Uploads\Audio;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Page.
@@ -31,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class Page extends BookChild
 {
+//     use SoftDeletes;
     use HasFactory;
 
     protected $fillable = ['name', 'priority'];
@@ -115,11 +119,37 @@ class Page extends BookChild
         return $this->hasMany(Attachment::class, 'uploaded_to')->orderBy('order', 'asc');
     }
 
+    public function audios()
+    {
+        return $this->hasMany(Audio::class, 'uploaded_to')->orderBy('order', 'asc');
+    }
+
     /**
      * Get the url of this page.
      */
     public function getUrl(string $path = ''): string
     {
+        // Extract the parent type and the remaining path
+        if ($this->parent_type && preg_match('/^(book_clubs|bookshelves|books|chapters|pages)\|(.+)$/', $this->parent_type, $matches)) {
+            $parentType = $matches[1]; // bookclub, bookshelf, or book
+            $remainingPath = $matches[2]; // book-clubs/12/books/23
+
+            $segments = explode('/', $remainingPath);
+            $result = [];
+
+            for ($i = 0; $i < count($segments); $i += 2) {
+                if (isset($segments[$i + 1]) && is_numeric($segments[$i + 1])) {
+                    $result[$segments[$i]] = (int) $segments[$i + 1];
+                }
+            }
+            $entityQueries = app(EntityQueries::class);
+            $url = "";
+            foreach ($result as $model_type => $model_id) {
+                $model_slug = $entityQueries->idToSlug($model_type, $model_id);
+                $url .= '/' . $model_type . '/' . $model_slug;
+            }
+            return url($url);
+        }
         $parts = [
             'books',
             urlencode($this->book_slug ?? $this->book->slug),

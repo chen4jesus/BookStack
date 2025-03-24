@@ -1,7 +1,7 @@
 <div class="entity-list {{ $style ?? '' }}">
     @if(count($entities) > 0)
         @foreach($entities as $index => $entity)
-            @include('entities.list-item-basic', ['entity' => $entity])
+            @include('entities.list-item-basic', ['entity' => $entity, 'bookclub' => $bookclub])
         @endforeach
     @else
         <p class="text-muted empty-text">

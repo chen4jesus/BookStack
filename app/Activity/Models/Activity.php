@@ -9,6 +9,7 @@ use BookStack\Users\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
@@ -24,6 +25,7 @@ use Illuminate\Support\Str;
  */
 class Activity extends Model
 {
+//     use SoftDeletes;
     /**
      * Get the loggable model related to this activity.
      * Currently only used for entities (previously entity_[id/type] columns).
@@ -63,7 +65,7 @@ class Activity extends Model
     public function isForEntity(): bool
     {
         return Str::startsWith($this->type, [
-            'page_', 'chapter_', 'book_', 'bookshelf_',
+            'page_', 'chapter_', 'book_', 'bookshelf_', 'book_club_'
         ]);
     }
 

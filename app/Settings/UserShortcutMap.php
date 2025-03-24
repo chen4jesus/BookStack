@@ -12,6 +12,7 @@ class UserShortcutMap
         "settings_view" => "4",
         "favourites_view" => "5",
         "profile_view" => "6",
+        "bookclub_view" => "7",
         "global_search" => "/",
         "logout" => "0",
 

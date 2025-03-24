@@ -18,7 +18,7 @@ class UserPreferencesController extends Controller
      */
     public function changeView(Request $request, string $type)
     {
-        $valueViewTypes = ['books', 'bookshelves', 'bookshelf'];
+        $valueViewTypes = ['books', 'bookshelves', 'bookshelf','bookclubs','bookclub'];
         if (!in_array($type, $valueViewTypes)) {
             return $this->redirectToRequest($request);
         }
@@ -39,7 +39,7 @@ class UserPreferencesController extends Controller
      */
     public function changeSort(Request $request, string $type)
     {
-        $validSortTypes = ['books', 'bookshelves', 'shelf_books', 'users', 'roles', 'webhooks', 'tags', 'page_revisions'];
+        $validSortTypes = ['books', 'bookshelves', 'bookclubs', 'shelf_books', 'club_books', 'users', 'roles', 'webhooks', 'tags', 'page_revisions'];
         if (!in_array($type, $validSortTypes)) {
             return $this->redirectToRequest($request);
         }

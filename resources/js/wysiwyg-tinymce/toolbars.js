@@ -12,7 +12,7 @@ export function getPrimaryToolbar(options) {
         'alignleft aligncenter alignright alignjustify',
         'bullist numlist listoverflow',
         textDirPlugins,
-        'link customtable imagemanager-insert insertoverflow',
+        'link customtable imagemanager-insert bibleverse insertoverflow',
         'code about fullscreen',
     ];
 

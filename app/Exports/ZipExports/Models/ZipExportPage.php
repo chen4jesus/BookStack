@@ -16,6 +16,8 @@ class ZipExportPage extends ZipExportModel
     public ?int $priority = null;
     /** @var ZipExportAttachment[] */
     public array $attachments = [];
+    /** @var ZipExportAudio[] */
+    public array $audios = [];
     /** @var ZipExportImage[] */
     public array $images = [];
     /** @var ZipExportTag[] */
@@ -27,6 +29,9 @@ class ZipExportPage extends ZipExportModel
 
         foreach ($this->attachments as $attachment) {
             $attachment->metadataOnly();
+        }
+        foreach ($this->audios as $audio) {
+            $audio->metadataOnly();
         }
         foreach ($this->images as $image) {
             $image->metadataOnly();
@@ -50,6 +55,7 @@ class ZipExportPage extends ZipExportModel
 
         $instance->tags = ZipExportTag::fromModelArray($model->tags()->get()->all());
         $instance->attachments = ZipExportAttachment::fromModelArray($model->attachments()->get()->all(), $files);
+        $instance->audios = ZipExportAudio::fromModelArray($model->audios()->get()->all(), $files);
 
         return $instance;
     }
@@ -74,12 +80,14 @@ class ZipExportPage extends ZipExportModel
             'markdown' => ['nullable', 'string'],
             'priority' => ['nullable', 'int'],
             'attachments' => ['array'],
+            'audios' => ['array'],
             'images' => ['array'],
             'tags' => ['array'],
         ];
 
         $errors = $context->validateData($data, $rules);
         $errors['attachments'] = $context->validateRelations($data['attachments'] ?? [], ZipExportAttachment::class);
+        $errors['audios'] = $context->validateRelations($data['audios'] ?? [], ZipExportAudio::class);
         $errors['images'] = $context->validateRelations($data['images'] ?? [], ZipExportImage::class);
         $errors['tags'] = $context->validateRelations($data['tags'] ?? [], ZipExportTag::class);
 
@@ -96,6 +104,7 @@ class ZipExportPage extends ZipExportModel
         $model->markdown = $data['markdown'] ?? null;
         $model->priority = isset($data['priority']) ? intval($data['priority']) : null;
         $model->attachments = ZipExportAttachment::fromManyArray($data['attachments'] ?? []);
+        $model->audios = ZipExportAudio::fromManyArray($data['audios'] ?? []);
         $model->images = ZipExportImage::fromManyArray($data['images'] ?? []);
         $model->tags = ZipExportTag::fromManyArray($data['tags'] ?? []);
 

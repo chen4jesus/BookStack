@@ -14,6 +14,7 @@ class EntityQueries
         public ChapterQueries $chapters,
         public PageQueries $pages,
         public PageRevisionQueries $revisions,
+        public BookClubQueries $bookclubs
     ) {
     }
 
@@ -30,6 +31,36 @@ class EntityQueries
         $queries = $this->getQueriesForType($entityType);
 
         return $queries->findVisibleById($entityId);
+    }
+
+
+    public function slugToId($model_type, $model_slug, $book_slug) {
+        if($model_type == "book-clubs"){
+            return $this->bookclubs->findVisibleBySlugOrFail($model_slug)->id;
+        }elseif($model_type == "shelves"){
+            return $this->shelves->findVisibleBySlugOrFail($model_slug)->id;
+        }elseif($model_type == "books"){
+            return $this->books->findVisibleBySlugOrFail($model_slug)->id;
+        }elseif($model_type == "chapter"){
+            return $this->chapters->findVisibleBySlugsOrFail($book_slug, $model_slug)->id;
+        }elseif($model_type == "page"){
+            return $this->pages->findVisibleBySlugsOrFail($book_slug, $model_slug)->id;
+        }
+        return null;
+    }
+    public function idToSlug($model_type, $model_id ) {
+        if($model_type == "book-clubs"){
+            return $this->bookclubs->findVisibleByIdOrFail($model_id)->slug;
+        }elseif($model_type == "chapter"){
+            return $this->chapters->findVisibleByIdOrFail($model_id)->slug;
+        }elseif($model_type == "books"){
+            return $this->books->findVisibleByIdOrFail($model_id)->slug;
+        }elseif($model_type == "shelves"){
+            return $this->chapters->findVisibleByIdOrFail($model_id)->slug;
+        }elseif($model_type == "page"){
+            return $this->pages->findVisibleByIdOrFail($model_id)->slug;
+        }
+        return null;
     }
 
     /**
@@ -50,6 +81,7 @@ class EntityQueries
             'chapter' => $this->chapters,
             'book' => $this->books,
             'bookshelf' => $this->shelves,
+            'bookclub' => $this->bookclubs,
             default => null,
         };
 

@@ -22,7 +22,7 @@ class MixedEntityRequestHelper
     {
         $entityType = $this->entities->get($requestData['type']);
 
-        return $entityType->newQuery()->scopes(['visible'])->findOrFail($requestData['id']);
+        return $entityType->newQuery()->findOrFail($requestData['id']);
     }
 
     /**

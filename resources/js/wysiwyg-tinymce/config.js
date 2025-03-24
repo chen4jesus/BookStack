@@ -14,6 +14,7 @@ import {getPlugin as getAboutPlugin} from './plugins-about';
 import {getPlugin as getDetailsPlugin} from './plugins-details';
 import {getPlugin as getTableAdditionsPlugin} from './plugins-table-additions';
 import {getPlugin as getTasklistPlugin} from './plugins-tasklist';
+import {getPlugin as getBibleVersePlugin} from './plugin-bibleverse';
 import {
     handleTableCellRangeEvents,
     handleEmbedAlignmentChanges,
@@ -130,6 +131,7 @@ function gatherPlugins(options) {
         'details',
         'tasklist',
         'tableadditions',
+        'bibleverse',
         options.textDirection === 'rtl' ? 'directionality' : '',
     ];
 
@@ -140,6 +142,7 @@ function gatherPlugins(options) {
     window.tinymce.PluginManager.add('details', getDetailsPlugin());
     window.tinymce.PluginManager.add('tasklist', getTasklistPlugin());
     window.tinymce.PluginManager.add('tableadditions', getTableAdditionsPlugin());
+    window.tinymce.PluginManager.add('bibleverse', getBibleVersePlugin());
 
     if (options.drawioUrl) {
         window.tinymce.PluginManager.add('drawio', getDrawioPlugin(options));
@@ -225,12 +228,30 @@ html, body, html.dark-mode {
 } 
 body {
     padding-left: 15px !important;
-    padding-right: 15px !important; 
-    height: initial !important;
-    margin:0!important; 
-    margin-left: auto! important;
-    margin-right: auto !important;
-    overflow-y: hidden !important;
+    padding-right: 15px !important;
+    box-sizing: border-box;
+    line-height: 1.6;
+    overflow-wrap: break-word;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    ${options.darkMode ? `color: #BBB;` : ''}
+    font-size: 12.5px;
+}
+
+code, pre {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+    direction: ltr;
+    text-align: left;
+}
+
+blockquote {
+    border-left: 4px solid #DDD;
+    padding-left: 1em;
+    margin-left: .5em;
+}
+
+body.dark-mode blockquote {
+    border-left-color: #555;
 }`.trim().replace('\n', '');
 }
 
@@ -280,7 +301,7 @@ export function buildForEditor(options) {
             '+doc-root[p|h1|h2|h3|h4|h5|h6|blockquote|code-block|div|hr]',
         ].join(','),
         plugins: gatherPlugins(options),
-        contextmenu: false,
+        contextmenu: 'bibleverse',
         toolbar: getPrimaryToolbar(options),
         content_style: getContentStyle(options),
         style_formats: styleFormats,
@@ -343,12 +364,12 @@ export function buildForInput(options) {
         remove_trailing_brs: false,
         statusbar: false,
         menubar: false,
-        plugins: 'link autolink lists',
-        contextmenu: false,
+        plugins: 'link autolink lists bibleverse',
+        contextmenu: 'bibleverse',
         toolbar: 'bold italic link bullist numlist',
         content_style: getContentStyle(options),
         file_picker_types: 'file',
-        valid_elements: 'p,a[href|title|target],ol,ul,li,strong,em,br',
+        valid_elements: 'p,a[href|title|target],ol,ul,li,strong,em,br,span[class|data-reference]',
         file_picker_callback: filePickerCallback,
         init_instance_callback(editor) {
             addCustomHeadContent(editor.getDoc());

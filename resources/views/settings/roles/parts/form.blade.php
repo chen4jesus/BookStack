@@ -71,13 +71,16 @@
                 <div refs="permissions-table@toggle-column" class="flex py-s px-m min-width-xxs">{{ trans('common.edit') }}</div>
                 <div refs="permissions-table@toggle-column" class="flex py-s px-m min-width-xxs">{{ trans('common.delete') }}</div>
             </div>
+            @include('settings.roles.parts.asset-permissions-row', ['title' => trans('entities.book_clubs'), 'permissionPrefix' => 'bookclub'])
             @include('settings.roles.parts.asset-permissions-row', ['title' => trans('entities.shelves'), 'permissionPrefix' => 'bookshelf'])
             @include('settings.roles.parts.asset-permissions-row', ['title' => trans('entities.books'), 'permissionPrefix' => 'book'])
             @include('settings.roles.parts.asset-permissions-row', ['title' => trans('entities.chapters'), 'permissionPrefix' => 'chapter'])
             @include('settings.roles.parts.asset-permissions-row', ['title' => trans('entities.pages'), 'permissionPrefix' => 'page'])
             @include('settings.roles.parts.related-asset-permissions-row', ['title' => trans('entities.images'), 'permissionPrefix' => 'image', 'refMark' => '1'])
             @include('settings.roles.parts.related-asset-permissions-row', ['title' => trans('entities.attachments'), 'permissionPrefix' => 'attachment'])
+            @include('settings.roles.parts.related-asset-permissions-row', ['title' => trans('entities.audios'), 'permissionPrefix' => 'audio'])
             @include('settings.roles.parts.related-asset-permissions-row', ['title' => trans('entities.comments'), 'permissionPrefix' => 'comment'])
+            @include('settings.roles.parts.asset-permissions-row', ['title' => trans('entities.reviews'), 'permissionPrefix' => 'review'])
         </div>
 
         <div>

@@ -2,16 +2,19 @@
 
 namespace BookStack\Search;
 
+use BookStack\Entities\Models\Book;
 use BookStack\Entities\Queries\PageQueries;
 use BookStack\Entities\Queries\QueryPopular;
 use BookStack\Entities\Tools\SiblingFetcher;
 use BookStack\Http\Controller;
+use BookStack\Entities\Queries\BookClubQueries;
 use Illuminate\Http\Request;
 
 class SearchController extends Controller
 {
     public function __construct(
         protected SearchRunner $searchRunner,
+        protected BookClubQueries $bookClubQueries,
         protected PageQueries $pageQueries,
     ) {
     }
@@ -23,13 +26,15 @@ class SearchController extends Controller
     {
         $searchOpts = SearchOptions::fromRequest($request);
         $fullSearchString = $searchOpts->toString();
-        $this->setPageTitle(trans('entities.search_for_term', ['term' => $fullSearchString]));
 
+        $this->setPageTitle(trans('entities.search_for_term', ['term' => $fullSearchString]));
+        
         $page = intval($request->get('page', '0')) ?: 1;
         $nextPageLink = url('/search?term=' . urlencode($fullSearchString) . '&page=' . ($page + 1));
-
+        
         $results = $this->searchRunner->searchEntities($searchOpts, 'all', $page, 20);
         $formatter->format($results['results']->all(), $searchOpts);
+        
 
         return view('search.all', [
             'entities'     => $results['results'],
@@ -81,7 +86,7 @@ class SearchController extends Controller
             $entities = $queryPopular->run(20, 0, $entityTypes);
         }
 
-        return view('search.parts.entity-selector-list', ['entities' => $entities, 'permission' => $permission]);
+        return view('search.parts.entity-selector-list', ['entities' => $entities,' bookclub' => null, 'book' => null, 'permission' => $permission]);
     }
 
     /**
@@ -130,13 +135,33 @@ class SearchController extends Controller
     /**
      * Search siblings items in the system.
      */
-    public function searchSiblings(Request $request, SiblingFetcher $siblingFetcher)
-    {
-        $type = $request->get('entity_type', null);
-        $id = $request->get('entity_id', null);
+ public function searchSiblings(Request $request, SiblingFetcher $siblingFetcher)
+{
+    $type = $request->get('entity_type', null);
+    $id = $request->get('entity_id', null);
+    $bookclubSlug = $request->get('bookclub_slug', null);
+    $bookclub = $bookclubSlug ? $this->bookClubQueries->findVisibleBySlugOrFail($bookclubSlug) : null;
+    
+    $entities = $siblingFetcher->fetch($type, $id);
+    $book = null;
 
-        $entities = $siblingFetcher->fetch($type, $id);
-
-        return view('entities.list-basic', ['entities' => $entities, 'style' => 'compact']);
+    if ($type === 'page' || $type === 'chapter' || $type === 'book') {
+        $entity = (new \BookStack\Entities\EntityProvider())->get($type)->visible()->find($id);
+        if ($entity instanceof \BookStack\Entities\Models\Book) {
+            $book = $entity;
+        } elseif ($entity && isset($entity->book)) {
+            $book = $entity->book;
+        }
     }
+
+    return view('entities.sibling-basic', [
+        'entities' => $entities,
+        'bookclub' => $bookclub,
+        'book' => $book,
+        'style' => 'compact'
+    ]);
+}
+
+
+
 }

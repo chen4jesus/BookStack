@@ -39,7 +39,9 @@ return [
         'ui-shortcuts-enabled'  => false,
         'dark-mode-enabled'     => env('APP_DEFAULT_DARK_MODE', false),
         'bookshelves_view_type' => env('APP_VIEWS_BOOKSHELVES', 'grid'),
+        'bookclubs_view_type' => env('APP_VIEWS_BOOKCLUBS', 'grid'),
         'bookshelf_view_type'   => env('APP_VIEWS_BOOKSHELF', 'grid'),
+        'bookclub_view_type'   => env('APP_VIEWS_BOOKCLUB', 'grid'),
         'books_view_type'       => env('APP_VIEWS_BOOKS', 'grid'),
     ],
 

@@ -137,4 +137,8 @@ return [
 
     // Other
     'permissions_update'          => 'updated permissions',
+
+    // Book Club
+    'bookclub_create' => 'created book club',
+    'bookclub_update' => 'updated book club',
 ];

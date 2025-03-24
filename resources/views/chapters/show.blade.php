@@ -15,10 +15,11 @@
 @section('body')
 
     <div class="mb-m print-hidden">
-        @include('entities.breadcrumbs', ['crumbs' => [
-            $chapter->book,
-            $chapter,
-        ]])
+        @include('entities.breadcrumbs', ['crumbs' => 
+                $bookclub
+                    ? [$bookclub, $chapter->book, $chapter]
+                    : [$chapter->book, $chapter]
+                    ])
     </div>
 
     <main class="content-wrap card">
@@ -28,7 +29,7 @@
             @if(count($pages) > 0)
                 <div class="entity-list book-contents">
                     @foreach($pages as $page)
-                        @include('pages.parts.list-item', ['page' => $page])
+                        @include('pages.parts.list-item', ['page' => $page, 'bookclub' => $bookclub ?? null, 'book' => $book ?? null])
                     @endforeach
                 </div>
             @else
@@ -57,6 +58,9 @@
 
         @include('entities.search-results')
     </main>
+    @if (Auth::check())
+        @include('layouts.parts.audio')
+    @endif
 
     @include('entities.sibling-navigation', ['next' => $next, 'previous' => $previous])
 

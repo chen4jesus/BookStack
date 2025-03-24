@@ -7,12 +7,14 @@ use BookStack\Entities\Models\Book;
 use BookStack\Entities\Models\Chapter;
 use BookStack\Entities\Models\Page;
 use BookStack\Exports\ZipExports\Models\ZipExportAttachment;
+use BookStack\Exports\ZipExports\Models\ZipExportAudio;
 use BookStack\Exports\ZipExports\Models\ZipExportBook;
 use BookStack\Exports\ZipExports\Models\ZipExportChapter;
 use BookStack\Exports\ZipExports\Models\ZipExportImage;
 use BookStack\Exports\ZipExports\Models\ZipExportModel;
 use BookStack\Exports\ZipExports\Models\ZipExportPage;
 use BookStack\Uploads\Attachment;
+use BookStack\Uploads\Audio;
 use BookStack\Uploads\Image;
 
 class ZipExportReferences
@@ -26,6 +28,9 @@ class ZipExportReferences
 
     /** @var ZipExportAttachment[] */
     protected array $attachments = [];
+
+    /** @var ZipExportAudio[] */
+    protected array $audios = [];
 
     /** @var ZipExportImage[] */
     protected array $images = [];
@@ -44,6 +49,12 @@ class ZipExportReferences
         foreach ($page->attachments as $attachment) {
             if ($attachment->id) {
                 $this->attachments[$attachment->id] = $attachment;
+            }
+        }
+
+        foreach ($page->audios as $audio) {
+            if ($audio->id) {
+                $this->audios[$audio->id] = $audio;
             }
         }
     }
@@ -117,6 +128,26 @@ class ZipExportReferences
             if (isset($this->attachments[$model->id])) {
                 return "[[bsexport:attachment:{$model->id}]]";
             }
+            return null;
+        }
+
+        // Handle audio references
+        if ($model instanceof Audio) {
+            // Always use the export reference format, regardless of whether the audio is external or not
+            if (isset($this->audios[$model->id])) {
+                return "[[bsexport:audio:{$model->id}]]";
+            }
+            
+            // For external audio files not yet in our reference map, add them first
+            if ($model->external && !isset($this->audios[$model->id])) {
+                $exportAudio = ZipExportAudio::fromModel($model, $files);
+                $this->audios[$model->id] = $exportAudio;
+                if ($exportModel instanceof ZipExportPage) {
+                    $exportModel->audios[] = $exportAudio;
+                }
+                return "[[bsexport:audio:{$model->id}]]";
+            }
+            
             return null;
         }
 

@@ -29,17 +29,17 @@
 
         <div class="tri-layout-sides print-hidden">
             <div class="tri-layout-sides-content">
+                <div class="tri-layout-left print-hidden" id="sidebar">
+                    <aside class="tri-layout-left-contents">
+                        @yield('left')
+                    </aside>
+                </div>
                 <div class="tri-layout-right print-hidden">
                     <aside class="tri-layout-right-contents">
                         @yield('right')
                     </aside>
                 </div>
 
-                <div class="tri-layout-left print-hidden" id="sidebar">
-                    <aside class="tri-layout-left-contents">
-                        @yield('left')
-                    </aside>
-                </div>
             </div>
         </div>
 

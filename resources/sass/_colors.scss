@@ -89,7 +89,10 @@
   color: var(--color-chapter);
   fill: var(--color-chapter);
 }
-
+.text-book-clubs, .text-book-clubs:hover {
+  color: var(--color-book-clubs);
+  fill: var(--color-book-clubs);
+}
 /*
  * Standard & Entity background colors
  */
@@ -103,5 +106,8 @@
   background-color: var(--color-chapter);
 }
 .bg-bookshelf {
-  background-color: var(--color-bookshelf);
+  background-color: var(--color-bookclub);
+}
+.bg-book-clubs {
+  background-color: var(--color-bookclub);
 }

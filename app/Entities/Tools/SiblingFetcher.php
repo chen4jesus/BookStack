@@ -4,9 +4,11 @@ namespace BookStack\Entities\Tools;
 
 use BookStack\Entities\EntityProvider;
 use BookStack\Entities\Models\Book;
+use BookStack\Entities\Models\BookClub;
 use BookStack\Entities\Models\Bookshelf;
 use BookStack\Entities\Models\Chapter;
 use BookStack\Entities\Models\Page;
+use BookStack\Entities\Queries\BookClubQueries;
 use BookStack\Entities\Queries\EntityQueries;
 use Illuminate\Support\Collection;
 
@@ -15,6 +17,7 @@ class SiblingFetcher
     public function __construct(
         protected EntityQueries $queries,
         protected ShelfContext $shelfContext,
+        protected BookClubQueries $bookClubQueries
     ) {
     }
 
@@ -23,19 +26,20 @@ class SiblingFetcher
      */
     public function fetch(string $entityType, int $entityId): Collection
     {
-        $entity = (new EntityProvider())->get($entityType)->visible()->findOrFail($entityId);
-        $entities = [];
 
+        $entity = (new EntityProvider())->get($entityType)->findOrFail($entityId);
+        $entities = [];
+        
         // Page in chapter
         if ($entity instanceof Page && $entity->chapter) {
             $entities = $entity->chapter->getVisiblePages();
         }
-
+        
         // Page in book or chapter
         if (($entity instanceof Page && !$entity->chapter) || $entity instanceof Chapter) {
             $entities = $entity->book->getDirectVisibleChildren();
         }
-
+        
         // Book
         // Gets just the books in a shelf if shelf is in context
         if ($entity instanceof Book) {
@@ -46,11 +50,16 @@ class SiblingFetcher
                 $entities = $this->queries->books->visibleForList()->orderBy('name', 'asc')->get();
             }
         }
-
+        
         // Shelf
         if ($entity instanceof Bookshelf) {
             $entities = $this->queries->shelves->visibleForList()->orderBy('name', 'asc')->get();
         }
+        
+        // book club
+        if ($entity instanceof BookClub) {
+            $entities = $this->bookClubQueries->visibleForList()->orderBy('name', 'asc')->get();
+        }    
 
         return $entities;
     }

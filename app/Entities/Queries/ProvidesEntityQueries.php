@@ -26,9 +26,11 @@ interface ProvidesEntityQueries
      */
     public function findVisibleById(int $id): ?Entity;
 
+
     /**
      * Start a query for items that are visible, with selection
      * configured for list display of this item.
      */
     public function visibleForList(): Builder;
 }
+

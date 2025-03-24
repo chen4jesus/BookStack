@@ -7,6 +7,8 @@ use BookStack\Activity\Tools\CommentTree;
 use BookStack\Activity\Tools\UserEntityWatchOptions;
 use BookStack\Entities\Models\Book;
 use BookStack\Entities\Models\Chapter;
+use BookStack\Entities\Models\PageTrack;
+use BookStack\Entities\Queries\BookClubQueries;
 use BookStack\Entities\Queries\EntityQueries;
 use BookStack\Entities\Queries\PageQueries;
 use BookStack\Entities\Repos\PageRepo;
@@ -20,9 +22,11 @@ use BookStack\Exceptions\NotFoundException;
 use BookStack\Exceptions\PermissionsException;
 use BookStack\Http\Controller;
 use BookStack\References\ReferenceFetcher;
+use BookStack\Uploads\Audio;
 use Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -32,9 +36,9 @@ class PageController extends Controller
         protected PageRepo $pageRepo,
         protected PageQueries $queries,
         protected EntityQueries $entityQueries,
-        protected ReferenceFetcher $referenceFetcher
-    ) {
-    }
+        protected ReferenceFetcher $referenceFetcher,
+        protected BookClubQueries $bookclubQueries,
+    ) {}
 
     /**
      * Show the form for creating a new page.
@@ -132,7 +136,7 @@ class PageController extends Controller
      *
      * @throws NotFoundException
      */
-    public function show(string $bookSlug, string $pageSlug)
+    public function show(string $bookSlug, string $pageSlug, string $club_id = "0",)
     {
         try {
             $page = $this->queries->findVisibleBySlugsOrFail($bookSlug, $pageSlug);
@@ -156,7 +160,10 @@ class PageController extends Controller
         $sidebarTree = (new BookContents($page->book))->getTree();
         $commentTree = (new CommentTree($page));
         $nextPreviousLocator = new NextPreviousContentLocator($page, $sidebarTree);
-
+        $audios = $page->audios;
+        foreach ($audios as $key => $audio) {
+            $audios[$key]->url = $audio->getUrl();
+        }
         View::incrementFor($page);
         $this->setPageTitle($page->getShortName());
 
@@ -164,6 +171,9 @@ class PageController extends Controller
             'page'            => $page,
             'book'            => $page->book,
             'current'         => $page,
+            'club_id'         => $club_id,
+            'bookclub'         => null,
+            'audios'          => $audios ?? null,
             'sidebarTree'     => $sidebarTree,
             'commentTree'     => $commentTree,
             'pageNav'         => $pageNav,
@@ -172,6 +182,111 @@ class PageController extends Controller
             'previous'        => $nextPreviousLocator->getPrevious(),
             'referenceCount'  => $this->referenceFetcher->getReferenceCountToEntity($page),
         ]);
+    }
+
+    public function savePageTrack(string $bookClubSlug, string $bookSlug, string $pageSlug, $page)
+    {
+        // Ensure user is authenticated
+        if (!auth()->check()) {
+            return redirect()->to('/login');
+        }
+
+        $user_id = auth()->id();
+
+        // Check permissions after authentication
+        $this->checkOwnablePermission('page-view', $page);
+
+        // Check if the page track already exists
+        $track = PageTrack::where('user_id', $user_id)
+            ->where('bookclub_slug', $bookClubSlug)
+            ->where('book_slug', $bookSlug)
+            ->where('page_slug', $pageSlug)
+            ->first();
+
+        // If no existing track, create a new one
+        if (!$track) {
+            PageTrack::create([
+                'user_id' => $user_id,
+                'bookclub_slug' => $bookClubSlug,
+                'book_slug' => $bookSlug,
+                'page_slug' => $pageSlug
+            ]);
+        }
+    }
+
+
+    public function showPage(string $bookClubSlug, string $bookSlug, string $pageSlug,)
+    {
+        if (!user()->isGuest()) {
+            $bookclub = $this->bookclubQueries->findVisibleBySlugOrFail($bookClubSlug);
+            $user_id = auth()->id();
+            $bookclub_id = $bookclub->id;
+
+            // Ensure you're checking the correct relationship in the database
+            $joinUser = DB::table('book_clubs_users')
+                ->where('user_id', $user_id)
+                ->where('book_clubs_id', $bookclub_id)
+                ->exists();  // This will return true if a record exists
+
+            // If user is not part of the book club or is not admin (user_id != 1)
+            if (!$joinUser && $user_id != 1) {
+                return redirect(url('/book-clubs'));
+            }
+
+            if ($user_id == 1 && !$joinUser) {
+                DB::table('book_clubs_users')->insert([
+                    'user_id' => $user_id,
+                    'book_clubs_id' => $bookclub_id
+                ]);
+            }
+
+            try {
+                $page = $this->queries->findVisibleBySlugsOrFail($bookSlug, $pageSlug);
+                $this->savePageTrack($bookClubSlug, $bookSlug, $pageSlug, $page);
+            } catch (NotFoundException $e) {
+                $revision = $this->entityQueries->revisions->findLatestVersionBySlugs($bookSlug, $pageSlug);
+                $page = $revision->page ?? null;
+
+                if (is_null($page)) {
+                    throw $e;
+                }
+
+                return redirect($page->getUrl());
+            }
+            $audios = $page->audios;
+            foreach ($audios as $key => $audio) {
+                $audios[$key]->url = $audio->getUrl();
+            }
+            $this->checkOwnablePermission('page-view', $page);
+
+            $pageContent = (new PageContent($page));
+            $page->html = $pageContent->render();
+            $pageNav = $pageContent->getNavigation($page->html);
+
+            $sidebarTree = (new BookContents($page->book))->getTree();
+            $commentTree = (new CommentTree($page));
+            $nextPreviousLocator = new NextPreviousContentLocator($page, $sidebarTree);
+
+            View::incrementFor($page);
+            $this->setPageTitle($page->getShortName());
+
+            return view('pages.show', [
+                'page'            => $page,
+                'book'            => $page->book,
+                'current'         => $page,
+                'bookclub'        => $bookclub ?? null,
+                'sidebarTree'     => $sidebarTree,
+                'commentTree'     => $commentTree,
+                'pageNav'         => $pageNav,
+                'audios'          => $audios ?? null,
+                'watchOptions'    => new UserEntityWatchOptions(user(), $page),
+                'next'            => $nextPreviousLocator->getNext(),
+                'previous'        => $nextPreviousLocator->getPrevious(),
+                'referenceCount'  => $this->referenceFetcher->getReferenceCountToEntity($page),
+            ]);
+        } else {
+            return redirect(url('/login'));
+        }
     }
 
     /**
@@ -204,7 +319,6 @@ class PageController extends Controller
         }
 
         $this->setPageTitle(trans('entities.pages_editing_named', ['pageName' => $page->getShortName()]));
-
         return view('pages.edit', $editorData->getViewData());
     }
 

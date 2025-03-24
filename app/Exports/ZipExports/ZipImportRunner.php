@@ -13,6 +13,7 @@ use BookStack\Exceptions\ZipExportException;
 use BookStack\Exceptions\ZipImportException;
 use BookStack\Exports\Import;
 use BookStack\Exports\ZipExports\Models\ZipExportAttachment;
+use BookStack\Exports\ZipExports\Models\ZipExportAudio;
 use BookStack\Exports\ZipExports\Models\ZipExportBook;
 use BookStack\Exports\ZipExports\Models\ZipExportChapter;
 use BookStack\Exports\ZipExports\Models\ZipExportImage;
@@ -20,6 +21,8 @@ use BookStack\Exports\ZipExports\Models\ZipExportPage;
 use BookStack\Exports\ZipExports\Models\ZipExportTag;
 use BookStack\Uploads\Attachment;
 use BookStack\Uploads\AttachmentService;
+use BookStack\Uploads\Audio;
+use BookStack\Uploads\AudioService;
 use BookStack\Uploads\FileStorage;
 use BookStack\Uploads\Image;
 use BookStack\Uploads\ImageService;
@@ -36,6 +39,7 @@ class ZipImportRunner
         protected BookRepo $bookRepo,
         protected ImageService $imageService,
         protected AttachmentService $attachmentService,
+        protected AudioService $audioService,
         protected ZipImportReferences $references,
     ) {
     }
@@ -190,6 +194,10 @@ class ZipImportRunner
             $this->importAttachment($exportAttachment, $page, $reader);
         }
 
+        foreach ($exportPage->audios as $exportAudio) {
+            $this->importAudio($exportAudio, $page, $reader);
+        }
+
         foreach ($exportPage->images as $exportImage) {
             $this->importImage($exportImage, $page, $reader);
         }
@@ -224,6 +232,27 @@ class ZipImportRunner
         $this->references->addAttachment($attachment, $exportAttachment->id);
 
         return $attachment;
+    }
+
+    protected function importAudio(ZipExportAudio $exportAudio, Page $page, ZipExportReader $reader): Audio
+    {
+        if ($exportAudio->file) {
+            $file = $this->zipFileToUploadedFile($exportAudio->file, $reader);
+            $audio = $this->audioService->saveNewUpload($file, $page->id);
+            $audio->name = $exportAudio->name;
+            $audio->save();
+        } else {
+            // Handle external audio links properly
+            $audio = $this->audioService->saveNewFromLink(
+                $exportAudio->name,
+                $exportAudio->link ?? '',
+                $page->id,
+            );
+        }
+
+        $this->references->addAudio($audio, $exportAudio->id);
+
+        return $audio;
     }
 
     protected function importImage(ZipExportImage $exportImage, Page $page, ZipExportReader $reader): Image

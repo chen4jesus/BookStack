@@ -5,6 +5,7 @@ namespace BookStack\Exports\ZipExports;
 use BookStack\App\Model;
 use BookStack\Entities\Queries\EntityQueries;
 use BookStack\References\ModelResolvers\AttachmentModelResolver;
+use BookStack\References\ModelResolvers\AudioModelResolver;
 use BookStack\References\ModelResolvers\BookLinkModelResolver;
 use BookStack\References\ModelResolvers\ChapterLinkModelResolver;
 use BookStack\References\ModelResolvers\CrossLinkModelResolver;
@@ -114,6 +115,7 @@ class ZipReferenceParser
             new BookLinkModelResolver($this->queries->books),
             new ImageModelResolver(),
             new AttachmentModelResolver(),
+            new AudioModelResolver(),
         ];
 
         return $this->modelResolvers;

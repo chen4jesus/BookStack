@@ -24,9 +24,10 @@
                             ?>
                             @include('search.parts.type-filter', ['checked' => !$hasTypes || in_array('page', $types), 'entity' => 'page', 'transKey' => 'page'])
                             @include('search.parts.type-filter', ['checked' => !$hasTypes || in_array('chapter', $types), 'entity' => 'chapter', 'transKey' => 'chapter'])
-                            <br>
                             @include('search.parts.type-filter', ['checked' => !$hasTypes || in_array('book', $types), 'entity' => 'book', 'transKey' => 'book'])
+                            <br>
                             @include('search.parts.type-filter', ['checked' => !$hasTypes || in_array('bookshelf', $types), 'entity' => 'bookshelf', 'transKey' => 'shelf'])
+                            @include('search.parts.type-filter', ['checked' => !$hasTypes || in_array('bookclub', $types), 'entity' => 'bookclub', 'transKey' => 'book_clubs'])
                         </div>
 
                         <h6>{{ trans('entities.search_exact_matches') }}</h6>

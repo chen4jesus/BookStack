@@ -1,7 +1,14 @@
 <div id="sibling-navigation" class="grid half collapse-xs items-center mb-m px-m no-row-gap fade-in-when-active print-hidden">
     <div>
         @if($previous)
-            <a href="{{  $previous->getUrl()  }}" data-shortcut="previous" class="outline-hover no-link-style block rounded">
+            <a href="{{ $bookclub
+            ? $bookclub->getUrl() .
+                '/books/' .
+                $book->slug .
+                (isset($previous->visible_pages) ? '/chapter/' . $previous->slug : '/page/' . $previous->slug)
+            : ($previous
+                ? $previous->getUrl()
+                : '#') }}" data-shortcut="previous" class="outline-hover no-link-style block rounded">
                 <div class="px-m pt-xs text-muted">{{ trans('common.previous') }}</div>
                 <div class="inline-block">
                     <div class="icon-list-item no-hover">
@@ -14,7 +21,14 @@
     </div>
     <div>
         @if($next)
-            <a href="{{  $next->getUrl()  }}" data-shortcut="next" class="outline-hover no-link-style block rounded text-xs-right">
+            <a href="{{ $bookclub
+                    ? $bookclub->getUrl() .
+                    '/books/' .
+                    $book->slug .
+                    (isset($next->visible_pages) ? '/chapter/' . $next->slug : '/page/' . $next->slug)
+                        : ($next
+                    ? $next->getUrl()
+                    : '#') }}" data-shortcut="next" class="outline-hover no-link-style block rounded text-xs-right">
                 <div class="px-m pt-xs text-muted text-xs-right">{{ trans('common.next') }}</div>
                 <div class="inline block">
                     <div class="icon-list-item no-hover">

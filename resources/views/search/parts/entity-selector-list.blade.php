@@ -5,6 +5,8 @@
             @include('entities.list-item', [
             'entity' => $entity,
             'showPath' => true,
+            'bookclub' => null,
+            'book' => null,
             'locked' => $permission !== 'view' && !userCan($permission, $entity)
             ])
         

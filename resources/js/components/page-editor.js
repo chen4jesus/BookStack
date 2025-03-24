@@ -49,6 +49,8 @@ export class PageEditor extends Component {
 
         if (this.pageId !== 0 && this.draftsEnabled) {
             window.setTimeout(() => {
+                localStorage.setItem("currentMedia", null)
+                localStorage.setItem("lastPlayedMedia", null)
                 this.startAutoSave();
             }, 1000);
         }

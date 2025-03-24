@@ -47,6 +47,7 @@ class SearchRunner
         $entityTypesToSearch = $entityTypes;
 
         $filterMap = $searchOpts->filters->toValueMap();
+
         if ($entityType !== 'all') {
             $entityTypesToSearch = [$entityType];
         } elseif (isset($filterMap['type'])) {
@@ -73,6 +74,7 @@ class SearchRunner
             $total += $entityTotal;
             $results = $results->merge($searchResults);
         }
+
 
         return [
             'total'    => $total,

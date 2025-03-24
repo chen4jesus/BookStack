@@ -137,4 +137,8 @@ return [
 
     // Other
     'permissions_update'          => '权限已更新',
+
+    // Book Club
+    'bookclub_create' => '创建了读书会',
+    'bookclub_update' => '修改了读书会',
 ];

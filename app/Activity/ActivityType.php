@@ -26,6 +26,11 @@ class ActivityType
     const BOOKSHELF_UPDATE = 'bookshelf_update';
     const BOOKSHELF_DELETE = 'bookshelf_delete';
 
+    const BOOKCLUB_CREATE = 'bookclub_create';
+    const BOOKCLUB_CREATE_FROM_BOOK = 'bookclub_create_from_book';
+    const BOOKCLUB_UPDATE = 'bookclub_update';
+    const BOOKCLUB_DELETE = 'bookclub_delete';
+
     const COMMENTED_ON = 'commented_on';
     const COMMENT_CREATE = 'comment_create';
     const COMMENT_UPDATE = 'comment_update';

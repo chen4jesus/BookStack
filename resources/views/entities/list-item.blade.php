@@ -1,4 +1,4 @@
-@component('entities.list-item-basic', ['entity' => $entity, 'classes' => (($locked ?? false) ? 'disabled ' : '') . ($classes ?? '') ])
+@component('entities.list-item-basic', ['entity' => $entity, 'bookclub' => $bookclub ?? null, 'book' => $book ?? null, 'classes' => (($locked ?? false) ? 'disabled ' : '') . ($classes ?? '') ])
 
 <div class="entity-item-snippet">
 

@@ -36,6 +36,8 @@ return [
     'reply' => 'Reply',
     'delete' => 'Delete',
     'delete_confirm' => 'Confirm Deletion',
+    'approve' => 'Approve',
+    'disapprove' => 'Disapprove',
     'search' => 'Search',
     'search_clear' => 'Clear Search',
     'reset' => 'Reset',
@@ -110,4 +112,15 @@ return [
 
     // OpenSearch
     'opensearch_description' => 'Search :appName',
+
+    // Hamburger Menu
+    'toggle_controls' => 'Toggle Controls',
+    'increase_font_size' => 'Increase Font Size',
+    'decrease_font_size' => 'Decrease Font Size',
+    'toggle_dark_mode' => 'Toggle Dark Mode',
+
+    //Plyr player
+    'toggle-player-fullsize' => 'Toggle Player Full-Size',
+    'toggle-player-reload' => 'Reload Player',
+    'toggle-player-close' => 'Close Player',
 ];

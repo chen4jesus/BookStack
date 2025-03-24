@@ -34,10 +34,25 @@ function setupPointerFilter(editor) {
 }
 
 /**
+ * Setup Bible verse formatter for Bible references
+ * @param {Editor} editor
+ */
+function setupBibleVerseFormatter(editor) {
+    editor.formatter.register('bibleverse', {
+        inline: 'span',
+        classes: 'bible-verse',
+        attributes: {
+            'data-reference': '%value'
+        }
+    });
+}
+
+/**
  * Setup global default filters for the given editor instance.
  * @param {Editor} editor
  */
 export function setupFilters(editor) {
     setupBrFilter(editor);
     setupPointerFilter(editor);
+    setupBibleVerseFormatter(editor);
 }

@@ -13,6 +13,8 @@ return new class extends Migration
         'BookStack\\Book'      => 'book',
         'BookStack\\Chapter'   => 'chapter',
         'BookStack\\Page'      => 'page',
+        'BookStack\\BookClub'  => 'bookclub',
+        'BookStack\\BookStackUser'  => 'user',
     ];
 
     /**

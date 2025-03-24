@@ -1,7 +1,11 @@
 @include('layouts.parts.header-links-start')
 
 @if (user()->hasAppAccess())
-    <a class="hide-over-l" href="{{ url('/search') }}">@icon('search'){{ trans('common.search') }}</a>
+<a class="hide-over-l" href="{{ url('/search') }}">@icon('search'){{ trans('common.search') }}</a>
+    @if(userCanOnAny('view', \BookStack\Entities\Models\BookClub::class) || userCan('bookclub-view-all') || userCan('bookclub-view-own'))
+        <a href="{{ url('/book-clubs') }}"
+        data-shortcut="bookclub_view">@icon('book-clubs'){{ trans('entities.book_clubs')}}</a>
+    @endif
     @if(userCanOnAny('view', \BookStack\Entities\Models\Bookshelf::class) || userCan('bookshelf-view-all') || userCan('bookshelf-view-own'))
         <a href="{{ url('/shelves') }}"
            data-shortcut="shelves_view">@icon('bookshelf'){{ trans('entities.shelves') }}</a>
@@ -15,6 +19,7 @@
         <a href="{{ url('/settings/users') }}"
            data-shortcut="settings_view">@icon('users'){{ trans('settings.users') }}</a>
     @endif
+   
 @endif
 
 @if(user()->isGuest())

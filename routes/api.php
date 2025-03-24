@@ -10,6 +10,7 @@ use BookStack\Activity\Controllers\AuditLogApiController;
 use BookStack\Api\ApiDocsController;
 use BookStack\Entities\Controllers as EntityControllers;
 use BookStack\Exports\Controllers as ExportControllers;
+use BookStack\Entities\Controllers\BibleVerseController;
 use BookStack\Permissions\ContentPermissionApiController;
 use BookStack\Search\SearchApiController;
 use BookStack\Uploads\Controllers\AttachmentApiController;
@@ -17,6 +18,7 @@ use BookStack\Uploads\Controllers\ImageGalleryApiController;
 use BookStack\Users\Controllers\RoleApiController;
 use BookStack\Users\Controllers\UserApiController;
 use Illuminate\Support\Facades\Route;
+use BookStack\Entities\Controllers\BulkDeleteController;
 
 Route::get('docs.json', [ApiDocsController::class, 'json']);
 
@@ -36,6 +38,8 @@ Route::get('books/{id}/export/html', [ExportControllers\BookExportApiController:
 Route::get('books/{id}/export/pdf', [ExportControllers\BookExportApiController::class, 'exportPdf']);
 Route::get('books/{id}/export/plaintext', [ExportControllers\BookExportApiController::class, 'exportPlainText']);
 Route::get('books/{id}/export/markdown', [ExportControllers\BookExportApiController::class, 'exportMarkdown']);
+Route::get('books/{id}/export/zip', [EntityControllers\BookApiController::class, 'zipBook']);
+Route::post('books/import/zip', [EntityControllers\BookApiController::class, 'unzipBook']);
 
 Route::get('chapters', [EntityControllers\ChapterApiController::class, 'list']);
 Route::post('chapters', [EntityControllers\ChapterApiController::class, 'create']);
@@ -92,3 +96,20 @@ Route::get('content-permissions/{contentType}/{contentId}', [ContentPermissionAp
 Route::put('content-permissions/{contentType}/{contentId}', [ContentPermissionApiController::class, 'update']);
 
 Route::get('audit-log', [AuditLogApiController::class, 'list']);
+
+// Add bulk delete endpoint
+Route::post('bulk-delete', [BulkDeleteController::class, 'bulkDelete']);
+
+/*
+ * Bible Verse API Routes - Public, no authentication required
+ */
+Route::prefix('bible')->middleware(['api'])->withoutMiddleware([\BookStack\Http\Middleware\ApiAuthenticate::class])->group(function () {
+    Route::get('/verses', [BibleVerseController::class, 'getVerses']);
+    Route::get('/parse', [BibleVerseController::class, 'parseReference']);
+    Route::get('/all', [BibleVerseController::class, 'getAllVerses']);
+    Route::get('/search', [BibleVerseController::class, 'searchVerses']);
+    Route::get('/debug-cache', [BibleVerseController::class, 'debugCache']);
+    Route::get('/refresh-cache', [BibleVerseController::class, 'refreshCache']);
+    Route::get('/test-cache', [BibleVerseController::class, 'testCache']);
+    Route::get('/multi-chapter', [BibleVerseController::class, 'getMultiChapterVerses']);
+});

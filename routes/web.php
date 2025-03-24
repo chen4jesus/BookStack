@@ -55,7 +55,23 @@ Route::middleware('auth')->group(function () {
     Route::put('/shelves/{slug}/permissions', [PermissionsController::class, 'updateForShelf']);
     Route::post('/shelves/{slug}/copy-permissions', [PermissionsController::class, 'copyShelfPermissionsToBooks']);
     Route::get('/shelves/{slug}/references', [ReferenceController::class, 'shelf']);
-
+    
+    // BookClubs
+    Route::get('/book-clubs', [EntityControllers\BookClubsController::class, "index"])->name('book-clubs');
+    Route::post('/book-clubs', [EntityControllers\BookClubsController::class, "store"])->name('book-clubs');
+    Route::get('/create-book-club', [EntityControllers\BookClubsController::class, "create"])->name('book-clubs');
+    Route::get('/book-clubs/{slug}', [EntityControllers\BookClubsController::class, 'show']);
+    Route::get('/book-clubs/{slug}/edit', [EntityControllers\BookClubsController::class, 'edit']);
+    Route::put('/book-clubs/{slug}', [EntityControllers\BookClubsController::class, 'update']);
+    Route::get('/book-clubs/{slug}/delete', [EntityControllers\BookClubsController::class, 'showDelete']);
+    Route::get('/book-clubs/{slug}/showjoin', [EntityControllers\BookClubsController::class, 'showJoin']);
+    Route::get('/book-clubs/{slug}/join', [EntityControllers\BookClubsController::class, 'join']);
+    Route::delete('/book-clubs/{slug}', [EntityControllers\BookClubsController::class, 'destroy']);
+    Route::get('/book-clubs/{slug}/members', [EntityControllers\BookClubsController::class, 'members']);
+    Route::get('/book-clubs/{slug}/showleave', [EntityControllers\BookClubsController::class, 'showLeave']);
+    Route::get('/book-clubs/{slug}/leave', [EntityControllers\BookClubsController::class, 'leave']);
+    Route::get('/books/{slug}', [EntityControllers\BookController::class, 'show']);
+    
     // Book Creation
     Route::get('/shelves/{shelfSlug}/create-book', [EntityControllers\BookController::class, 'create']);
     Route::post('/shelves/{shelfSlug}/create-book', [EntityControllers\BookController::class, 'store']);
@@ -83,7 +99,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/books/{bookSlug}/export/markdown', [ExportControllers\BookExportController::class, 'markdown']);
     Route::get('/books/{bookSlug}/export/zip', [ExportControllers\BookExportController::class, 'zip']);
     Route::get('/books/{bookSlug}/export/plaintext', [ExportControllers\BookExportController::class, 'plainText']);
-
+    
+    Route::post('/books/{bookSlug}/reviews', [EntityControllers\BookController::class, 'bookReview']);
+    Route::post('book-clubs/{bookclubSlug}/books/{bookSlug}/reviews', [EntityControllers\BookController::class, 'bookclubReview']);
+    Route::get('/books/{bookSlug}/review/delete', [EntityControllers\BookController::class, 'deleteReview']);
+    Route::get('/books/{bookSlug}/review/approve', [EntityControllers\BookController::class, 'approveReview']);
+    Route::get('/books/{bookSlug}/review/disapprove', [EntityControllers\BookController::class, 'disapproveReview']);
     // Pages
     Route::get('/books/{bookSlug}/create-page', [EntityControllers\PageController::class, 'create']);
     Route::post('/books/{bookSlug}/create-guest-page', [EntityControllers\PageController::class, 'createAsGuest']);
@@ -141,6 +162,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/books/{bookSlug}/chapter/{chapterSlug}/delete', [EntityControllers\ChapterController::class, 'showDelete']);
     Route::delete('/books/{bookSlug}/chapter/{chapterSlug}', [EntityControllers\ChapterController::class, 'destroy']);
 
+    //connecting book club and book
+    Route::get('/book-clubs/{bookclubSlug}/books/{bookslug}', [EntityControllers\BookController::class, 'showBook']);
+    Route::get('/book-clubs/{slug}/books/{bookSlug}/page/{pageSlug}', [EntityControllers\PageController::class, 'showPage'])->name('pages.show');
+    Route::get('/book-clubs/{slug}/books/{bookSlug}/chapter/{chapterSlug}', [EntityControllers\ChapterController::class, 'showChapter']);
+
     // User Profile routes
     Route::get('/user/{slug}', [UserControllers\UserProfileController::class, 'show']);
 
@@ -166,6 +192,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/attachments/get/page/{pageId}', [UploadControllers\AttachmentController::class, 'listForPage']);
     Route::put('/attachments/sort/page/{pageId}', [UploadControllers\AttachmentController::class, 'sortForPage']);
     Route::delete('/attachments/{id}', [UploadControllers\AttachmentController::class, 'delete']);
+    // audio routes
+    Route::get('/audios/{id}', [UploadControllers\AudioController::class, 'get']);
+    Route::post('/audios/upload', [UploadControllers\AudioController::class, 'upload']);
+    Route::post('/audios/upload/{id}', [UploadControllers\AudioController::class, 'uploadUpdate']);
+    Route::post('/audios/link', [UploadControllers\AudioController::class, 'attachLink']);
+    Route::put('/audios/{id}', [UploadControllers\AudioController::class, 'update']);
+    Route::get('/audios/edit/{id}', [UploadControllers\AudioController::class, 'getUpdateForm']);
+    Route::get('/audios/get/page/{pageId}', [UploadControllers\AudioController::class, 'listForPage']);
+    Route::put('/audios/sort/page/{pageId}', [UploadControllers\AudioController::class, 'sortForPage']);
+    Route::delete('/audios/{id}', [UploadControllers\AudioController::class, 'delete']);
 
     // AJAX routes
     Route::put('/ajax/page/{id}/save-draft', [EntityControllers\PageController::class, 'saveDraft']);

@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password', 60);
             $table->rememberToken();
+            $table->integer('created_by')->nullable()->default(null);
+            $table->integer('updated_by')->nullable()->default(null);
+            $table->boolean('restricted')->default(false);
             $table->nullableTimestamps();
         });
 

@@ -19,7 +19,7 @@ class MixedEntityListLoader
      * This will look for a model id and type via 'name_id' and 'name_type'.
      * @param Model[] $relations
      */
-    public function loadIntoRelations(array $relations, string $relationName, bool $loadParents): void
+    public function loadIntoRelations(array $relations, string $relationName, bool $loadParents, string $relationAttribute = ''): void
     {
         $idsByType = [];
         foreach ($relations as $relation) {
@@ -39,6 +39,12 @@ class MixedEntityListLoader
             $type = $relation->getAttribute($relationName . '_type');
             $id = $relation->getAttribute($relationName . '_id');
             $related = $modelMap[$type][strval($id)] ?? null;
+            if ($relationAttribute) {
+                $parent_type = $relation->getAttribute($relationAttribute);
+                if ($parent_type) {
+                    $related->parent_type = $parent_type;
+                }
+            }
             if ($related) {
                 $relation->setRelation($relationName, $related);
             }

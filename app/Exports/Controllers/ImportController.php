@@ -53,6 +53,21 @@ class ImportController extends Controller
 
         return redirect($import->getUrl());
     }
+    // public function upload(Request $request)
+    // {
+    //     $this->validate($request, [
+    //         'file' => ['required', ...AttachmentService::getFileValidationRules()]
+    //     ]);
+
+    //     $file = $request->file('file');
+    //     try {
+    //         $import = $this->imports->storeFromUpload($file);
+    //     } catch (ZipValidationException $exception) {
+    //         return redirect('/import')->with('validation_errors', $exception->errors);
+    //     }
+
+    //     return redirect($import->getUrl());
+    // }
 
     /**
      * Show a pending import, with a form to allow progressing

@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $tables = ['pages', 'books', 'chapters', 'bookshelves'];
+        $tables = ['pages', 'books', 'chapters', 'bookshelves', 'book_clubs', 'users'];
         foreach ($tables as $table) {
             Schema::table($table, function (Blueprint $table) {
                 $table->integer('owned_by')->unsigned()->index();
@@ -31,7 +31,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        $tables = ['pages', 'books', 'chapters', 'bookshelves'];
+        $tables = ['pages', 'books', 'chapters', 'bookshelves', 'book_clubs', 'users'];
         foreach ($tables as $table) {
             Schema::table($table, function (Blueprint $table) {
                 $table->dropColumn('owned_by');

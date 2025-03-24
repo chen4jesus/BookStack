@@ -4,6 +4,7 @@ namespace BookStack\Entities\Tools;
 
 use BookStack\Entities\EntityProvider;
 use BookStack\Entities\Models\Book;
+use BookStack\Entities\Models\BookClub;
 use BookStack\Entities\Models\Bookshelf;
 use BookStack\Entities\Models\Chapter;
 use BookStack\Entities\Models\Deletion;
@@ -14,6 +15,7 @@ use BookStack\Entities\Queries\EntityQueries;
 use BookStack\Exceptions\NotifyException;
 use BookStack\Facades\Activity;
 use BookStack\Uploads\AttachmentService;
+use BookStack\Uploads\AudioService;
 use BookStack\Uploads\ImageService;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -36,6 +38,17 @@ class TrashCan
         $this->ensureDeletable($shelf);
         Deletion::createForEntity($shelf);
         $shelf->delete();
+    }
+     /**
+     * Send a shelf to the recycle bin.
+     *
+     * @throws NotifyException
+     */
+    public function softDestroyBookclub(BookClub $bookclub)
+    {
+        $this->ensureDeletable($bookclub);
+        Deletion::createForEntity($bookclub);
+        $bookclub->delete();
     }
 
     /**
@@ -206,6 +219,11 @@ class TrashCan
         $attachmentService = app()->make(AttachmentService::class);
         foreach ($page->attachments as $attachment) {
             $attachmentService->deleteFile($attachment);
+        }
+
+        $audioService = app()->make(AudioService::class);
+        foreach ($page->audios as $audio) {
+            $audioService->deleteFile($audio);
         }
 
         // Remove book template usages

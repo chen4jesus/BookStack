@@ -65,4 +65,77 @@ export function register(editor) {
             entityPermission: 'view',
         });
     });
+
+    // Bible verse shortcut (Alt+v), select any valid verse(s) then press this hotkey to generate bible verse reference.
+    editor.shortcuts.add('alt+v', '', () => {
+        // Make sure we're in edit mode
+        if (!editor.mode || editor.mode.get() !== 'design') {
+            return;
+        }
+        
+        const selectedText = editor.selection.getContent({format: 'text'}).trim();
+        
+        if (selectedText) {
+            // Replace selected text with a Bible verse span
+            const bibleVerseSpan = editor.dom.createHTML('span', {
+                'class': 'bible-verse',
+                'data-reference': selectedText
+            }, editor.dom.encode(selectedText));
+            
+            editor.selection.setContent(bibleVerseSpan);
+            editor.nodeChanged();
+            
+            // Show a quick notification to confirm
+            editor.notificationManager.open({
+                text: `Bible verse reference created: ${selectedText}`,
+                type: 'success',
+                timeout: 500
+            });
+        } else {
+            // If no text is selected, show an error message
+            editor.notificationManager.open({
+                text: 'Please select text to convert to a Bible verse reference',
+                type: 'warning',
+                timeout: 500
+            });
+        }
+    });
+    
+    // Bible verse remove shortcut (Alt+r), select a Bible verse reference then press this hotkey to remove formatting
+    editor.shortcuts.add('alt+c', '', () => {
+        // Make sure we're in edit mode
+        if (!editor.mode || editor.mode.get() !== 'design') {
+            return;
+        }
+        
+        // Check if selection contains or is within a Bible verse span
+        const selectedNode = editor.selection.getNode();
+        const bibleVerseSpan = selectedNode.nodeName === 'SPAN' && selectedNode.classList.contains('bible-verse') 
+            ? selectedNode 
+            : selectedNode.closest('.bible-verse');
+        
+        if (bibleVerseSpan) {
+            // Get the text content of the Bible verse reference
+            const referenceText = bibleVerseSpan.textContent;
+            
+            // Replace the Bible verse span with plain text
+            const textNode = editor.getDoc().createTextNode(referenceText);
+            editor.dom.replace(textNode, bibleVerseSpan);
+            editor.nodeChanged();
+            
+            // Show a quick notification to confirm
+            editor.notificationManager.open({
+                text: 'Bible verse reference removed',
+                type: 'success',
+                timeout: 500
+            });
+        } else {
+            // If no Bible verse reference is selected, show an error message
+            editor.notificationManager.open({
+                text: 'Please select a Bible verse reference to remove formatting',
+                type: 'warning',
+                timeout: 500
+            });
+        }
+    });
 }

@@ -69,6 +69,9 @@
   .drag-card-action {
     cursor: pointer;
   }
+  .pl-0 {
+    padding-left: unset!important;
+  }
   .handle, .drag-card-action {
     display: flex;
     align-items: center;
@@ -97,6 +100,9 @@
     position: absolute;
     top: 0;
     bottom: 0;
+  }
+  .content {
+    max-width: 98%;
   }
   > div {
     padding: 0 vars.$s;

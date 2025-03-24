@@ -365,5 +365,10 @@ return [
         'zh_CN' => '简体中文',
         'zh_TW' => '繁體中文',
     ],
+
+    // Book Club
+    'members_progress' => '成员与进度',
+    'members_search' => '查找成员',
+    'members' => '成员列表',
     //!////////////////////////////////
 ];

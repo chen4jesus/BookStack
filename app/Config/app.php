@@ -35,7 +35,7 @@ return [
     'recycle_bin_lifetime' => env('RECYCLE_BIN_LIFETIME', 30),
 
     // The limit for all uploaded files, including images and attachments in MB.
-    'upload_limit' => env('FILE_UPLOAD_SIZE_LIMIT', 50),
+    'upload_limit' => env('FILE_UPLOAD_SIZE_LIMIT', 100),
 
     // Allow <script> tags to entered within page content.
     // <script> tags are escaped by default.

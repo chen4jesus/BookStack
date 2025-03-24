@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('user_id')->index();
             $table->integer('favouritable_id');
             $table->string('favouritable_type', 100);
+            $table->string('favouritable_parent', 100);
             $table->timestamps();
 
             $table->index(['favouritable_id', 'favouritable_type'], 'favouritable_index');

@@ -13,6 +13,7 @@ use BookStack\Exports\ZipExports\Models\ZipExportBook;
 use BookStack\Exports\ZipExports\Models\ZipExportChapter;
 use BookStack\Exports\ZipExports\Models\ZipExportPage;
 use BookStack\Uploads\Attachment;
+use BookStack\Uploads\Audio;
 use BookStack\Uploads\Image;
 use BookStack\Uploads\ImageResizer;
 
@@ -26,6 +27,8 @@ class ZipImportReferences
     protected array $books = [];
     /** @var Attachment[] */
     protected array $attachments = [];
+    /** @var Audio[] */
+    protected array $audios = [];
     /** @var Image[] */
     protected array $images = [];
 
@@ -82,6 +85,12 @@ class ZipImportReferences
         $this->addReference('attachment', $attachment, $importId);
     }
 
+    public function addAudio(Audio $audio, ?int $importId): void
+    {
+        $this->audios[] = $audio;
+        $this->addReference('audio', $audio, $importId);
+    }
+
     public function addImage(Image $image, ?int $importId): void
     {
         $this->images[] = $image;
@@ -102,6 +111,8 @@ class ZipImportReferences
 
             return $model->url;
         } else if ($model instanceof Attachment) {
+            return $model->getUrl(false);
+        } else if ($model instanceof Audio) {
             return $model->getUrl(false);
         }
 
@@ -157,5 +168,10 @@ class ZipImportReferences
     public function attachments(): array
     {
         return $this->attachments;
+    }
+
+    public function audios(): array
+    {
+        return $this->audios;
     }
 }

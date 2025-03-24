@@ -20,6 +20,7 @@ return new class extends Migration
 
         // Create & attach new admin permissions
         $permissionsToCreate = [
+            'book-clubs-manage'         => 'Manage Book Clubs',
             'settings-manage'         => 'Manage Settings',
             'users-manage'            => 'Manage Users',
             'user-roles-manage'       => 'Manage Roles & Permissions',
@@ -40,7 +41,7 @@ return new class extends Migration
         }
 
         // Create & attach new entity permissions
-        $entities = ['Book', 'Page', 'Chapter', 'Image'];
+        $entities = ['Book', 'Page', 'Chapter', 'Image','User'];
         $ops = ['Create All', 'Create Own', 'Update All', 'Update Own', 'Delete All', 'Delete Own'];
         foreach ($entities as $entity) {
             foreach ($ops as $op) {

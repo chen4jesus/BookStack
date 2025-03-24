@@ -43,6 +43,7 @@ class PageRevisionController extends Controller
             ->selectRaw("IF(markdown = '', false, true) as is_markdown")
             ->with(['page.book', 'createdBy'])
             ->reorder('id', $listOptions->getOrder())
+            ->reorder('created_at', $listOptions->getOrder())
             ->paginate(50);
 
         $this->setPageTitle(trans('entities.pages_revisions_named', ['pageName' => $page->getShortName()]));

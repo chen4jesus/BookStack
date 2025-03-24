@@ -2,10 +2,13 @@
 
 @section('body')
     @include('books.parts.list', ['books' => $books, 'view' => $view, 'listOptions' => $listOptions])
+    @if (Auth::check())
+        @include('layouts.parts.audio')
+    @endif
 @stop
 
 @section('left')
-    @if($recents)
+    @if ($recents)
         <div id="recents" class="mb-xl">
             <h5>{{ trans('entities.recently_viewed') }}</h5>
             @include('entities.list', ['entities' => $recents, 'style' => 'compact'])
@@ -14,7 +17,7 @@
 
     <div id="popular" class="mb-xl">
         <h5>{{ trans('entities.books_popular') }}</h5>
-        @if(count($popular) > 0)
+        @if (count($popular) > 0)
             @include('entities.list', ['entities' => $popular, 'style' => 'compact'])
         @else
             <p class="text-muted pb-l mb-none">{{ trans('entities.books_popular_empty') }}</p>
@@ -23,7 +26,7 @@
 
     <div id="new" class="mb-xl">
         <h5>{{ trans('entities.books_new') }}</h5>
-        @if(count($new) > 0)
+        @if (count($new) > 0)
             @include('entities.list', ['entities' => $new, 'style' => 'compact'])
         @else
             <p class="text-muted pb-l mb-none">{{ trans('entities.books_new_empty') }}</p>
@@ -36,8 +39,8 @@
     <div class="actions mb-xl">
         <h5>{{ trans('common.actions') }}</h5>
         <div class="icon-list text-link">
-            @if(userCan('book-create-all'))
-                <a href="{{ url("/create-book") }}" data-shortcut="new" class="icon-list-item">
+            @if (userCan('book-create-all'))
+                <a href="{{ url('/create-book') }}" data-shortcut="new" class="icon-list-item">
                     <span>@icon('add')</span>
                     <span>{{ trans('entities.books_create') }}</span>
                 </a>
@@ -50,7 +53,7 @@
                 <span>{{ trans('entities.tags_view_tags') }}</span>
             </a>
 
-            @if(userCan('content-import'))
+            @if (userCan('content-import'))
                 <a href="{{ url('/import') }}" class="icon-list-item">
                     <span>@icon('upload')</span>
                     <span>{{ trans('entities.import') }}</span>

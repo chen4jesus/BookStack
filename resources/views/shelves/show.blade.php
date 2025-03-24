@@ -65,6 +65,9 @@
             @endif
         </div>
     </main>
+    @if (Auth::check())
+        @include('layouts.parts.audio')
+    @endif
 
 @stop
 

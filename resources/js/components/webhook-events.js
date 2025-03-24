@@ -17,6 +17,7 @@ export class WebhookEvents extends Component {
                 this.allCheckbox.checked = false;
             }
         });
+        
     }
 
     deselectIndividualEvents() {

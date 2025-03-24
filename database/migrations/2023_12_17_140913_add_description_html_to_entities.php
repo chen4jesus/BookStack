@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::table('books', $addColumn);
         Schema::table('chapters', $addColumn);
         Schema::table('bookshelves', $addColumn);
+        Schema::table('book_clubs', $addColumn);
     }
 
     /**
@@ -28,5 +29,6 @@ return new class extends Migration
         Schema::table('books', $removeColumn);
         Schema::table('chapters', $removeColumn);
         Schema::table('bookshelves', $removeColumn);
+        Schema::table('book_clubs', $removeColumn);
     }
 };

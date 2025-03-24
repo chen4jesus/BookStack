@@ -36,6 +36,8 @@ return [
     'reply' => '回复',
     'delete' => '删除',
     'delete_confirm' => '确认删除',
+    'approve' => '批准',
+    'disapprove' => '否决',
     'search' => '搜索',
     'search_clear' => '清除搜索',
     'reset' => '重置',
@@ -110,4 +112,15 @@ return [
 
     // OpenSearch
     'opensearch_description' => '搜索 :appName',
+
+    // Hamburger Menu
+    'toggle_controls' => '菜单',
+    'increase_font_size' => '增大字体',
+    'decrease_font_size' => '减小字体',
+    'toggle_dark_mode' => '夜间模式',
+
+    //Plyr player
+    'toggle-player-fullsize' => '播放器全尺寸',
+    'toggle-player-reload' => '重新加载播放器',
+    'toggle-player-close' => '关闭播放器',
 ];

@@ -35,17 +35,15 @@ class PermissionApplicator
 
         $user = $this->currentUser();
         $userRoleIds = $this->getCurrentUserRoleIds();
-
         $allRolePermission = $user->can($fullPermission . '-all');
         $ownRolePermission = $user->can($fullPermission . '-own');
-        $nonJointPermissions = ['restrictions', 'image', 'attachment', 'comment'];
+        $nonJointPermissions = ['restrictions', 'image', 'attachment', 'comment', 'audio'];
         $ownerField = ($ownable instanceof Entity) ? 'owned_by' : 'created_by';
         $ownableFieldVal = $ownable->getAttribute($ownerField);
-
         if (is_null($ownableFieldVal)) {
             throw new InvalidArgumentException("{$ownerField} field used but has not been loaded");
         }
-
+        
         $isOwner = $user->id === $ownableFieldVal;
         $hasRolePermission = $allRolePermission || ($isOwner && $ownRolePermission);
 
@@ -214,7 +212,8 @@ class PermissionApplicator
      */
     protected function currentUser(): User
     {
-        return $this->user ?? user();
+        $user = $this->user ?? user();
+        return $user;
     }
 
     /**

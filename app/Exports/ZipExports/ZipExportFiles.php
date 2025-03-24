@@ -4,6 +4,8 @@ namespace BookStack\Exports\ZipExports;
 
 use BookStack\Uploads\Attachment;
 use BookStack\Uploads\AttachmentService;
+use BookStack\Uploads\Audio;
+use BookStack\Uploads\AudioService;
 use BookStack\Uploads\Image;
 use BookStack\Uploads\ImageService;
 use Illuminate\Support\Str;
@@ -17,6 +19,12 @@ class ZipExportFiles
     protected array $attachmentRefsById = [];
 
     /**
+     * References for audio files by audio ID.
+     * @var array<int, string>
+     */
+    protected array $audioRefsById = [];
+
+    /**
      * References for images by image ID.
      * @var array<int, string>
      */
@@ -24,6 +32,7 @@ class ZipExportFiles
 
     public function __construct(
         protected AttachmentService $attachmentService,
+        protected AudioService $audioService,
         protected ImageService $imageService,
     ) {
     }
@@ -45,6 +54,27 @@ class ZipExportFiles
         } while (in_array($fileName, $existingFiles));
 
         $this->attachmentRefsById[$attachment->id] = $fileName;
+
+        return $fileName;
+    }
+
+    /**
+     * Gain a reference to the given audio instance.
+     * This is expected to be a file-based audio that the user
+     * has visibility of, no permission/access checks are performed here.
+     */
+    public function referenceForAudio(Audio $audio): string
+    {
+        if (isset($this->audioRefsById[$audio->id])) {
+            return $this->audioRefsById[$audio->id];
+        }
+
+        $existingFiles = $this->getAllFileNames();
+        do {
+            $fileName = Str::random(20) . '.' . $audio->extension;
+        } while (in_array($fileName, $existingFiles));
+
+        $this->audioRefsById[$audio->id] = $fileName;
 
         return $fileName;
     }
@@ -75,6 +105,7 @@ class ZipExportFiles
     {
         return array_merge(
             array_values($this->attachmentRefsById),
+            array_values($this->audioRefsById),
             array_values($this->imageRefsById),
         );
     }
@@ -90,6 +121,15 @@ class ZipExportFiles
             $attachment = Attachment::query()->find($attachmentId);
             $stream = $this->attachmentService->streamAttachmentFromStorage($attachment);
             $tmpFile = tempnam(sys_get_temp_dir(), 'bszipfile-');
+            $tmpFileStream = fopen($tmpFile, 'w');
+            stream_copy_to_stream($stream, $tmpFileStream);
+            $callback($tmpFile, $ref);
+        }
+
+        foreach ($this->audioRefsById as $audioId => $ref) {
+            $audio = Audio::query()->find($audioId);
+            $stream = $this->audioService->streamAudioFromStorage($audio);
+            $tmpFile = tempnam(sys_get_temp_dir(), 'bszipaudio-');
             $tmpFileStream = fopen($tmpFile, 'w');
             stream_copy_to_stream($stream, $tmpFileStream);
             $callback($tmpFile, $ref);

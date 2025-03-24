@@ -23,6 +23,7 @@
 @use "lists";
 @use "pages";
 @use "content";
+@use "bible-verse";
 
 @media print {
   @include meta.load-css("print");

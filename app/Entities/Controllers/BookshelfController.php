@@ -124,9 +124,8 @@ class BookshelfController extends Controller
         View::incrementFor($shelf);
         $this->shelfContext->setShelfContext($shelf->id);
         $view = setting()->getForCurrentUser('bookshelf_view_type');
-
+        
         $this->setPageTitle($shelf->getShortName());
-
         return view('shelves.show', [
             'shelf'                   => $shelf,
             'sortedVisibleShelfBooks' => $sortedVisibleShelfBooks,
