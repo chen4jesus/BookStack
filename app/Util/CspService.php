@@ -85,8 +85,13 @@ class CspService
     protected function getFrameAncestors(): string
     {
         $iframeHosts = $this->getAllowedIframeHosts();
+        
+        // Add '*' to allow embedding from any domain
+        if (empty($iframeHosts)) {
+            return 'frame-ancestors * \'self\'';
+        }
+        
         array_unshift($iframeHosts, "'self'");
-
         return 'frame-ancestors ' . implode(' ', $iframeHosts);
     }
 
