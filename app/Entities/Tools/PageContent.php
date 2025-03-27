@@ -262,16 +262,13 @@ class PageContent
             return [$existingId, $existingId];
         }
 
-        // Create a unique id for the element
-        // Uses the content as a basis to ensure output is the same every time
-        // the same content is passed through.
-        $contentId = 'bkmrk-' . mb_substr(strtolower(preg_replace('/\s+/', '-', trim($element->nodeValue))), 0, 20);
-        $newId = urlencode($contentId);
-        $loopIndex = 1;
+        // Create a unique id for the element using UUID
+        $uuid = uniqid();
+        $newId = 'bkmrk-' . $uuid;
 
         while (isset($idMap[$newId])) {
-            $newId = urlencode($contentId . '-' . $loopIndex);
-            $loopIndex++;
+            $uuid = uniqid();
+            $newId = 'bkmrk-' . $uuid;
         }
 
         $element->setAttribute('id', $newId);
