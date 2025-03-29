@@ -98,7 +98,7 @@ function run_database_setup() {
 # Download BookStack
 function run_bookstack_download() {
   cd /var/www || exit
-  git clone https://github.com/chen4jesus/BookStack.git --branch FC-Bookclub-Enhancement-Test --single-branch bookstack
+  git clone https://github.com/chen4jesus/BookStack.git --branch FC-BookStack-Enhancement-Test --single-branch bookstack
 }
 
 # Install composer
