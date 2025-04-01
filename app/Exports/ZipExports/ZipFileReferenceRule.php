@@ -21,15 +21,16 @@ class ZipFileReferenceRule implements ValidationRule
     {
         if (!$this->context->zipReader->fileExists($value)) {
             $fail('validation.zip_file')->translate();
+            return;
         }
 
         if (!empty($this->acceptedMimes)) {
             $fileMime = $this->context->zipReader->sniffFileMime($value);
-            if (!in_array($fileMime, $this->acceptedMimes)) {
+            if (empty($fileMime) || !in_array($fileMime, $this->acceptedMimes)) {
                 $fail('validation.zip_file_mime')->translate([
                     'attribute' => $attribute,
                     'validTypes' => implode(',', $this->acceptedMimes),
-                    'foundType' => $fileMime
+                    'foundType' => $fileMime ?: 'unknown'
                 ]);
             }
         }

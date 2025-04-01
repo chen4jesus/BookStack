@@ -87,6 +87,10 @@ class ZipExportReader
     public function sniffFileMime(string $fileName): string
     {
         $stream = $this->streamFile($fileName);
+        if ($stream === false) {
+            return '';
+        }
+        
         $sniffContent = fread($stream, 2000);
 
         return (new WebSafeMimeSniffer())->sniff($sniffContent);
