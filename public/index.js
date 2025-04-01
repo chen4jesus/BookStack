@@ -354,7 +354,7 @@ $(document).ready(function () {
                             currentIndex = index;
                             
                             // Play the media - this will handle savePlaybackTime internally
-                            playMedia(index);
+                            playMedia(index, true);
                             
                             // If a specific start time was provided (versus the file's saved time)
                             // override the restored time after a delay to ensure media has loaded
@@ -393,7 +393,7 @@ $(document).ready(function () {
                         currentIndex = index;
 
                             // Play the media - this will handle savePlaybackTime internally
-                            playMediaNoDouble(index);
+                            playMediaNoDouble(index, true);
 
                             // If a specific start time was provided (versus the file's saved time)
                             // override the restored time after a delay to ensure media has loaded
@@ -622,7 +622,7 @@ $(document).ready(function () {
                     // Double check we haven't already moved on (prevents double advancing)
                     if (currentIndex === nextIndex - 1) {
                         // Play the next track
-                        playMedia(nextIndex);
+                        playMedia(nextIndex, false);
                     } else {
                         console.log(`Index changed during timeout: ${currentIndex} vs expected ${nextIndex - 1}`);
                     }
@@ -655,7 +655,7 @@ $(document).ready(function () {
                 if (!carousel.hasClass('visible')) {
                     const currentMedia = mediaList[currentIndex];
                     if (currentMedia) {
-                        carousel.text(currentMedia.name);
+                        carousel.text('正在收听: '+currentMedia.name);
                         carousel.addClass('visible');
                         // Check if text overflows and apply sliding animation if needed
                         setTimeout(function() {
@@ -674,7 +674,7 @@ $(document).ready(function () {
                 if (!carousel.hasClass('visible')) {
                     const currentMedia = mediaList[currentIndex];
                     if (currentMedia) {
-                        carousel.text(currentMedia.name);
+                        carousel.text('正在收听: '+currentMedia.name);
                         carousel.addClass('visible');
                         // Check if text overflows and apply sliding animation if needed
                         setTimeout(function() {
@@ -698,7 +698,7 @@ $(document).ready(function () {
                 if (!carousel.hasClass('visible')) {
                     const currentMedia = mediaList[currentIndex];
                     if (currentMedia) {
-                        carousel.text(currentMedia.name);
+                        carousel.text('正在收听: '+currentMedia.name);
                         carousel.addClass('visible');
                         // Check if text overflows and apply sliding animation if needed
                         setTimeout(function() {
@@ -718,7 +718,7 @@ $(document).ready(function () {
             const currentMedia = mediaList[currentIndex];
             
             if (currentMedia) {
-                carousel.text(currentMedia.name);
+                carousel.text('正在收听: '+currentMedia.name);
                 carousel.addClass('visible');
                 
                 // Check if text overflows and apply sliding animation if needed
@@ -914,7 +914,7 @@ $(document).ready(function () {
         }
 
         // Play selected media
-        function playMedia(index) {
+        function playMedia(index, isUserAction = false) {
             if (mediaList.length === 0) return;
             const videoElement1 = document.querySelector(".plyr.plyr--video");
             const audioElement1 = document.querySelector(".plyr.plyr--audio");
@@ -963,7 +963,7 @@ $(document).ready(function () {
             if (carousel.hasClass('visible')) {
                 carousel.css('animation', 'carouselUpdate 1s ease');
                 setTimeout(function() {
-                    carousel.text(fileName);
+                    carousel.text('正在收听: '+fileName);
                     // Check if text overflows and apply sliding animation if needed
                     setTimeout(function() {
                         checkTextOverflow(carousel);
@@ -971,7 +971,7 @@ $(document).ready(function () {
                 }, 500); // Update text at midpoint of animation
             } else {
                 // First time display
-                carousel.text(fileName);
+                carousel.text('正在收听: '+fileName);
                 carousel.addClass('visible');
                 // Check if text overflows and apply sliding animation if needed
                 setTimeout(function() {
@@ -1010,7 +1010,7 @@ $(document).ready(function () {
                     // Only try to restore time for the specific media file that is currently being played
                     // This avoids applying one file's position to a different file
                     restorePlaybackTime(videoPlayer, mediaPath);
-                    attemptPlay(videoPlayer, videoElement);
+                    attemptPlay(videoPlayer, videoElement, isUserAction);
                     
                     // Save playback position for the current media file
                     savePlaybackTime(videoPlayer, mediaPath);
@@ -1042,7 +1042,7 @@ $(document).ready(function () {
                     // Only try to restore time for the specific media file that is currently being played
                     // This avoids applying one file's position to a different file
                     restorePlaybackTime(audioPlayer, mediaPath);
-                    attemptPlay(audioPlayer, audioElement);
+                    attemptPlay(audioPlayer, audioElement, isUserAction);
                     
                     // Save playback position for the current media file
                     savePlaybackTime(audioPlayer, mediaPath);
@@ -1053,7 +1053,7 @@ $(document).ready(function () {
             localStorage.setItem("lastPlayedMedia", mediaPath);
         }
 
-        function playMediaNoDouble(index) {
+        function playMediaNoDouble(index, isUserAction = false) {
             // Add a flag to prevent multiple playback attempts
             if (window.isPlaying) {
                 console.log("Playback already in progress, skipping duplicate");
@@ -1110,7 +1110,7 @@ $(document).ready(function () {
             if (carousel.hasClass('visible')) {
                 carousel.css('animation', 'carouselUpdate 1s ease');
                 setTimeout(function() {
-                    carousel.text(fileName);
+                    carousel.text('正在收听: '+fileName);
                     // Check if text overflows and apply sliding animation if needed
                     setTimeout(function() {
                         checkTextOverflow(carousel);
@@ -1118,7 +1118,7 @@ $(document).ready(function () {
                 }, 500); // Update text at midpoint of animation
             } else {
                 // First time display
-                carousel.text(fileName);
+                carousel.text('正在收听: '+fileName);
                 carousel.addClass('visible');
                 // Check if text overflows and apply sliding animation if needed
                 setTimeout(function() {
@@ -1157,7 +1157,7 @@ $(document).ready(function () {
                     // Only try to restore time for the specific media file that is currently being played
                     // This avoids applying one file's position to a different file
                     restorePlaybackTime(videoPlayer, mediaPath);
-                    attemptPlay(videoPlayer, videoElement);
+                    attemptPlay(videoPlayer, videoElement, isUserAction);
 
                     // Save playback position for the current media file
                     savePlaybackTime(videoPlayer, mediaPath);
@@ -1189,7 +1189,7 @@ $(document).ready(function () {
                     // Only try to restore time for the specific media file that is currently being played
                     // This avoids applying one file's position to a different file
                     restorePlaybackTime(audioPlayer, mediaPath);
-                    attemptPlay(audioPlayer, audioElement);
+                    attemptPlay(audioPlayer, audioElement, isUserAction);
 
                     // Save playback position for the current media file
                     savePlaybackTime(audioPlayer, mediaPath);
@@ -1205,7 +1205,7 @@ $(document).ready(function () {
             }, 2000); // 2 second delay before allowing new playback
         }
 
-        function attemptPlay(player, element) {
+        function attemptPlay(player, element, isUserAction = false) {
             // Make sure the player is in a fresh state
             if (player.media) {
                 // Ensure we're using the right player (sometimes Plyr can lose its connection)
@@ -1214,10 +1214,11 @@ $(document).ready(function () {
                 }
                 
                 // Attempt to play with better error handling
-                let playPromise = player.play();
-                if (playPromise !== undefined) {
-                    playPromise
-                        .then(() => {
+                if (isUserAction) {
+                    let playPromise = player.play();
+                    if (playPromise !== undefined) {
+                        playPromise
+                            .then(() => {
                             console.log("Playback started successfully");
                         })
                         .catch((error) => {
@@ -1247,18 +1248,19 @@ $(document).ready(function () {
                                 }
                             }, 100);
                         });
-                } else {
-                    // For older browsers that don't return a promise
-                    setTimeout(() => {
-                        if (element.paused) {
-                            console.warn("Play didn't return promise and media is still paused");
-                            try {
-                                element.play();
-                            } catch (e) {
-                                console.error("Legacy play attempt failed:", e);
+                    } else {
+                        // For older browsers that don't return a promise
+                        setTimeout(() => {
+                            if (element.paused) {
+                                console.warn("Play didn't return promise and media is still paused");
+                                try {
+                                    element.play();
+                                } catch (e) {
+                                    console.error("Legacy play attempt failed:", e);
+                                }
                             }
-                        }
-                    }, 100);
+                        }, 100);
+                    }
                 }
             } else {
                 console.error("Invalid player object");
@@ -1266,13 +1268,13 @@ $(document).ready(function () {
         }
 
         function restartPlayback(index) {
-            playMedia(index);
+            playMedia(index, false);
         }
         
         // Click event to play selected track
         $("#playlist").on("click", "li", function () {
             let index = $(this).data("index");
-            playMedia(index);
+            playMedia(index, true);
         });
         $("#toggle-player").click(function () {
             $("#media-container").toggleClass("minimized expanded");
@@ -1535,12 +1537,12 @@ $(document).ready(function () {
             let foundIndex = mediaList.findIndex(media => media.url === lastPlayed);
             if (foundIndex !== -1) {
                 currentIndex = foundIndex; // Set current index
-                playMedia(foundIndex);
+                playMedia(foundIndex, false);
                 updateActiveItem(foundIndex); // Update active styling
             }
         } else if (mediaList && mediaList.length > 0) {
             currentIndex = 0; // Start with the first media
-            playMedia(0);
+            playMedia(0, false);
             updateActiveItem(0); // Update active styling
         }
         

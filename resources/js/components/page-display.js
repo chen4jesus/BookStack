@@ -312,7 +312,7 @@ export class PageDisplay extends Component {
                     
                     // Show the current file name in carousel
                     const carousel = $('#active-file-carousel');
-                    carousel.text(media.name);
+                    carousel.text('正在收听: '+media.name);
                     carousel.addClass('visible');
                     
                     // Check if text overflows and apply sliding animation if needed
