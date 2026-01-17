@@ -16,6 +16,7 @@ import {registerShortcuts} from "./services/shortcuts";
 import {registerNodeResizer} from "./ui/framework/helpers/node-resizer";
 import {registerKeyboardHandling} from "./services/keyboard-handling";
 import {registerAutoLinks} from "./services/auto-links";
+import {registerBilingualHandling} from "./services/bilingual-handling";
 
 export function createPageEditorInstance(container: HTMLElement, htmlContent: string, options: Record<string, any> = {}): SimpleWysiwygEditorInterface {
     const config: CreateEditorArgs = {
@@ -66,6 +67,7 @@ export function createPageEditorInstance(container: HTMLElement, htmlContent: st
         registerDropPasteHandling(context),
         registerNodeResizer(context),
         registerAutoLinks(editor),
+        registerBilingualHandling(editor),
     );
 
     listenToCommonEvents(editor);

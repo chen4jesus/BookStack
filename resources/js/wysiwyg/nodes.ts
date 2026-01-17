@@ -9,6 +9,7 @@ import {
 import {LinkNode} from "@lexical/link";
 import {ImageNode} from "@lexical/rich-text/LexicalImageNode";
 import {DetailsNode} from "@lexical/rich-text/LexicalDetailsNode";
+import {BilingualNode} from "@lexical/rich-text/LexicalBilingualNode";
 import {ListItemNode, ListNode} from "@lexical/list";
 import {TableCellNode, TableNode, TableRowNode} from "@lexical/table";
 import {HorizontalRuleNode} from "@lexical/rich-text/LexicalHorizontalRuleNode";
@@ -19,6 +20,7 @@ import {MediaNode} from "@lexical/rich-text/LexicalMediaNode";
 import {HeadingNode} from "@lexical/rich-text/LexicalHeadingNode";
 import {QuoteNode} from "@lexical/rich-text/LexicalQuoteNode";
 import {CaptionNode} from "@lexical/table/LexicalCaptionNode";
+import {BibleVerseNode} from "@lexical/rich-text/LexicalBibleVerseNode";
 
 /**
  * Load the nodes for lexical.
@@ -37,11 +39,13 @@ export function getNodesForPageEditor(): (KlassConstructor<typeof LexicalNode> |
         ImageNode, // TODO - Alignment
         HorizontalRuleNode,
         DetailsNode,
+        BilingualNode,
         CodeBlockNode,
         DiagramNode,
         MediaNode, // TODO - Alignment
         ParagraphNode,
         LinkNode,
+        BibleVerseNode,
     ];
 }
 

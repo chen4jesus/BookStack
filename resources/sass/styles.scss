@@ -24,6 +24,7 @@
 @use "pages";
 @use "content";
 @use "bible-verse";
+@use "bilingual";
 
 @media print {
   @include meta.load-css("print");

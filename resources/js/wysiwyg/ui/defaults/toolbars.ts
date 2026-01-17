@@ -76,6 +76,8 @@ import {
     link, media,
     unlink
 } from "./buttons/objects";
+import {bilingual} from "./buttons/bilingual";
+import {bibleVerse} from "./buttons/bible-verse";
 import {el} from "../../utils/dom";
 import {EditorButtonWithMenu} from "../framework/blocks/button-with-menu";
 import {EditorSeparator} from "../framework/blocks/separator";
@@ -196,6 +198,8 @@ export function getMainEditorFullToolbar(context: EditorUiContext): EditorContai
             ),
             new EditorButton(media),
             new EditorButton(details),
+            new EditorButton(bilingual),
+            new EditorButton(bibleVerse),
         ]),
 
         // Meta elements

@@ -67,3 +67,4 @@ export {WysiwygInput} from './wysiwyg-input';
 export {BookReview} from './book-review';
 export {BookReviews} from './book-reviews';
 export {BibleVerseModal} from './bible-verse-modal';
+export {BilingualContent} from './bilingual-content';

@@ -64,6 +64,17 @@ export class MarkdownEditor extends Component {
             }
             if (action === 'insertDrawing') this.editor.actions.startDrawing();
             if (action === 'fullscreen') this.editor.actions.fullScreen();
+            if (action === 'insertBilingual') {
+                const bilingualTemplate = `{{< bilingual >}}
+::zh::
+在此输入中文内容。
+
+::en::
+Enter English content here.
+
+{{< /bilingual >}}`;
+                this.editor.actions.insertContent(bilingualTemplate);
+            }
         });
 
         // Mobile section toggling

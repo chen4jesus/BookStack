@@ -1,5 +1,6 @@
 import {EditorFormModalDefinition} from "../framework/modals";
 import {details, image, link, media} from "./forms/objects";
+import {bibleVerse} from "./forms/bible-verse";
 import {about, source} from "./forms/controls";
 import {cellProperties, rowProperties, tableProperties} from "./forms/tables";
 
@@ -39,5 +40,9 @@ export const modals: Record<string, EditorFormModalDefinition> = {
     about: {
         title: 'About the WYSIWYG Editor',
         form: about,
+    },
+    'bible-verse': {
+        title: 'Insert Bible Verse Reference',
+        form: bibleVerse,
     }
 };

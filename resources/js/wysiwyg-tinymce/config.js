@@ -15,6 +15,7 @@ import {getPlugin as getDetailsPlugin} from './plugins-details';
 import {getPlugin as getTableAdditionsPlugin} from './plugins-table-additions';
 import {getPlugin as getTasklistPlugin} from './plugins-tasklist';
 import {getPlugin as getBibleVersePlugin} from './plugin-bibleverse';
+import {getPlugin as getBilingualPlugin} from './plugins-bilingual';
 import {
     handleTableCellRangeEvents,
     handleEmbedAlignmentChanges,
@@ -132,6 +133,7 @@ function gatherPlugins(options) {
         'tasklist',
         'tableadditions',
         'bibleverse',
+        'bilingual',
         options.textDirection === 'rtl' ? 'directionality' : '',
     ];
 
@@ -143,6 +145,7 @@ function gatherPlugins(options) {
     window.tinymce.PluginManager.add('tasklist', getTasklistPlugin());
     window.tinymce.PluginManager.add('tableadditions', getTableAdditionsPlugin());
     window.tinymce.PluginManager.add('bibleverse', getBibleVersePlugin());
+    window.tinymce.PluginManager.add('bilingual', getBilingualPlugin());
 
     if (options.drawioUrl) {
         window.tinymce.PluginManager.add('drawio', getDrawioPlugin(options));

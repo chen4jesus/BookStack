@@ -4,6 +4,7 @@ namespace BookStack\Entities\Tools;
 
 use BookStack\Entities\Models\Page;
 use BookStack\Entities\Queries\PageQueries;
+use BookStack\Entities\Tools\Markdown\HtmlToMarkdown;
 use BookStack\Entities\Tools\Markdown\MarkdownToHtml;
 use BookStack\Exceptions\ImageUploadException;
 use BookStack\Facades\Theme;
@@ -32,13 +33,15 @@ class PageContent
 
     /**
      * Update the content of the page with new provided HTML.
+     * Also auto-converts HTML to Markdown for dual storage.
      */
     public function setNewHTML(string $html, User $updater): void
     {
         $html = $this->extractBase64ImagesFromHtml($html, $updater);
         $this->page->html = $this->formatHtml($html);
         $this->page->text = $this->toPlainText();
-        $this->page->markdown = '';
+        // Auto-convert HTML to Markdown for dual storage
+        $this->page->markdown = (new HtmlToMarkdown($this->page->html))->convert();
     }
 
     /**
@@ -168,7 +171,7 @@ class PageContent
 
         return [
             'extension' => $extension,
-            'data'      => base64_decode($base64ImageData) ?: '',
+            'data' => base64_decode($base64ImageData) ?: '',
         ];
     }
 
@@ -317,7 +320,13 @@ class PageContent
             HtmlContentFilter::removeScriptsFromDocument($doc);
         }
 
-        return $doc->getBodyInnerHtml();
+        $renderedHtml = $doc->getBodyInnerHtml();
+
+        // Process bilingual content blocks
+        $bilingualParser = new BilingualContentParser();
+        $renderedHtml = $bilingualParser->parse($renderedHtml);
+
+        return $renderedHtml;
     }
 
     /**
@@ -381,9 +390,9 @@ class PageContent
 
             return [
                 'nodeName' => strtolower($header->nodeName),
-                'level'    => intval(str_replace('h', '', $header->nodeName)),
-                'link'     => '#' . $header->getAttribute('id'),
-                'text'     => $text,
+                'level' => intval(str_replace('h', '', $header->nodeName)),
+                'link' => '#' . $header->getAttribute('id'),
+                'text' => $text,
             ];
         })->filter(function ($header) {
             return mb_strlen($header['text']) > 0;
