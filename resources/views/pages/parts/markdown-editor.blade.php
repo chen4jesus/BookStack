@@ -53,7 +53,7 @@
                 </div>
             </div>
             <iframe src="about:blank" refs="markdown-editor@display" class="markdown-display flex flex-fill"
-                sandbox="allow-same-origin"></iframe>
+                sandbox="allow-same-origin allow-scripts"></iframe>
         </div>
     </div>
 </div>
